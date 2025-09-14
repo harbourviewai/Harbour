@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Auth - Harbourview AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6">Authentication Debug Page</h1>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4">Current Auth State</h2>
+            <div id="authInfo" class="space-y-2">
+                <!-- Auth info will be populated here -->
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4">Actions</h2>
+            <div class="space-x-4">
+                <button onclick="clearAuth()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Clear Auth State</button>
+                <button onclick="setTestAuth()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Set Admin Auth</button>
+                <button onclick="setRegularUserAuth()" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">Set Regular User Auth</button>
+                <button onclick="refreshAuthInfo()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Refresh Info</button>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold mb-4">Navigation</h2>
+            <div class="space-x-4">
+                <a href="login.html" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 inline-block">Go to Login</a>
+                <a href="overview.html" class="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 inline-block">Go to Overview</a>
+                <a href="admin.html" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 inline-block">Go to Admin</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function refreshAuthInfo() {
+            const authState = localStorage.getItem('auth_state');
+            const redirectPath = sessionStorage.getItem('redirect_after_login');
+            
+            document.getElementById('authInfo').innerHTML = `
+                <div><strong>Auth State:</strong> ${authState ? 'Present' : 'Not Found'}</div>
+                <div><strong>Auth Data:</strong> <pre>${authState || 'None'}</pre></div>
+                <div><strong>Redirect Path:</strong> ${redirectPath || 'None'}</div>
+                <div><strong>Current Path:</strong> ${window.location.pathname}</div>
+                <div><strong>Timestamp:</strong> ${new Date().toLocaleString()}</div>
+            `;
+        }
+        
+        function clearAuth() {
+            localStorage.removeItem('auth_state');
+            sessionStorage.removeItem('redirect_after_login');
+            refreshAuthInfo();
+            alert('Auth state cleared!');
+        }
+        
+        function setTestAuth() {
+            const testUser = {
+                id: 1,
+                email: 'admin@harbourview.ai',
+                name: 'Admin User',
+                role: 'admin',
+                client_id: null
+            };
+            localStorage.setItem('auth_state', JSON.stringify(testUser));
+            refreshAuthInfo();
+            alert('Admin test auth state set! You should now be able to access admin.html');
+        }
+        
+        function setRegularUserAuth() {
+            const testUser = {
+                id: 2,
+                email: 'executive@sterlinglaw.com',
+                name: 'Sarah Johnson',
+                role: 'executive',
+                client_id: 'sterling-associates'
+            };
+            localStorage.setItem('auth_state', JSON.stringify(testUser));
+            refreshAuthInfo();
+            alert('Regular user test auth state set! You should now be able to access overview.html');
+        }
+        
+        // Initial load
+        refreshAuthInfo();
+        
+        // Refresh every 2 seconds
+        setInterval(refreshAuthInfo, 2000);
+    </script>
+</body>
+</html>

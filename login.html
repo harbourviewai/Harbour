@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Harbourview AI Strategy Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
+
+    <!-- Main Login Container -->
+    <div class="relative flex items-center justify-center min-h-screen px-4">
+        <div class="w-full max-w-md">
+            <!-- Logo and Branding -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-2xl shadow-lg mb-6">
+                    <img src="Harbourview AI logo black transparent.png" 
+                         alt="Harbourview AI Logo" 
+                         class="w-12 h-12 object-contain">
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+                <p class="text-gray-600">Sign in to your AI Strategy Dashboard</p>
+            </div>
+
+            <!-- Login Card -->
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <!-- Login Form -->
+                <form id="loginForm" class="space-y-6">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                        <div class="relative">
+                            <input type="email" id="email" required 
+                                   class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                                   placeholder="Enter your email">
+                            <i data-lucide="mail" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <div class="relative">
+                            <input type="password" id="password" required 
+                                   class="w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                                   placeholder="Enter your password">
+                            <i data-lucide="lock" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                            <button type="button" id="togglePassword" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
+                                <i data-lucide="eye" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="rememberMe" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <label for="rememberMe" class="ml-2 text-sm text-gray-600">Remember me</label>
+                        </div>
+                        <button type="button" id="forgotPassword" class="text-sm text-blue-600 hover:text-blue-500 transition-colors">Forgot password?</button>
+                    </div>
+
+                    <button type="submit" id="loginBtn" 
+                            class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span id="loginBtnText">Sign In</span>
+                        <div id="loginSpinner" class="hidden inline-block w-4 h-4 ml-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    </button>
+                </form>
+
+                <!-- Error Message -->
+                <div id="loginError" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div class="flex items-center">
+                        <i data-lucide="alert-circle" class="w-5 h-5 text-red-600 mr-3"></i>
+                        <span id="loginErrorText" class="text-sm text-red-600"></span>
+                    </div>
+                </div>
+
+                <!-- Demo Access -->
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600 mb-3">Want to explore without an account?</p>
+                        <button id="demoAccess" class="text-sm text-blue-600 hover:text-blue-500 font-medium transition-colors">
+                            Continue as Demo User
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center mt-8">
+                <p class="text-sm text-gray-500">
+                    © 2024 Harbourview AI. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Notification -->
+    <div id="successNotification" class="hidden fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        <div class="flex items-center">
+            <i data-lucide="check-circle" class="w-5 h-5 mr-2"></i>
+            <span id="successMessage"></span>
+        </div>
+    </div>
+
+    <script>
+        // Authentication Manager
+        class AuthManager {
+            constructor() {
+                this.isAuthenticated = false;
+                this.currentUser = null;
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.checkAuthStatus();
+            }
+
+            bindEvents() {
+                // Login form submit
+                document.getElementById('loginForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleLogin();
+                });
+
+                // Demo access
+                document.getElementById('demoAccess').addEventListener('click', () => {
+                    this.handleDemoAccess();
+                });
+
+                // Password toggle
+                document.getElementById('togglePassword').addEventListener('click', () => {
+                    this.togglePasswordVisibility();
+                });
+
+                // Forgot password
+                document.getElementById('forgotPassword').addEventListener('click', () => {
+                    this.handleForgotPassword();
+                });
+
+                // Enter key on inputs
+                document.getElementById('email').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        document.getElementById('password').focus();
+                    }
+                });
+            }
+
+            async handleLogin() {
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const rememberMe = document.getElementById('rememberMe').checked;
+
+                if (!email || !password) {
+                    this.showError('Please enter both email and password');
+                    return;
+                }
+
+                this.setLoading(true);
+
+                try {
+                    // Authenticate user
+                    const user = await this.authenticateUser(email, password);
+                    
+                    if (user) {
+                        this.isAuthenticated = true;
+                        this.currentUser = user;
+                        this.saveAuthState(user, rememberMe);
+                        console.log('Login: User authenticated and saved:', user.name, user.role);
+                        console.log('Login: Auth state saved to localStorage:', localStorage.getItem('auth_state'));
+                        this.showSuccess(`Welcome back, ${user.name}!`);
+                        
+                        // Redirect based on user role
+                        setTimeout(() => {
+                            const redirectUrl = this.getRedirectUrl(user);
+                            console.log('Login: Redirecting to:', redirectUrl);
+                            window.location.href = redirectUrl;
+                        }, 1500);
+                    } else {
+                        this.showError('Invalid email or password');
+                    }
+                } catch (error) {
+                    this.showError('Login failed. Please try again.');
+                    console.error('Login error:', error);
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+
+            async authenticateUser(email, password) {
+                // Demo users for testing
+                const demoUsers = [
+                    {
+                        id: 1,
+                        email: 'admin@harbourview.ai',
+                        password: 'admin123',
+                        name: 'Admin User',
+                        role: 'admin',
+                        client_id: null
+                    },
+                    {
+                        id: 2,
+                        email: 'executive@sterlinglaw.com',
+                        password: 'exec123',
+                        name: 'Sarah Johnson',
+                        role: 'executive',
+                        client_id: 'sterling-associates'
+                    },
+                    {
+                        id: 3,
+                        email: 'teamlead@sterlinglaw.com',
+                        password: 'team123',
+                        name: 'Mike Chen',
+                        role: 'team_lead',
+                        client_id: 'sterling-associates'
+                    },
+                    {
+                        id: 4,
+                        email: 'viewer@sterlinglaw.com',
+                        password: 'view123',
+                        name: 'Alex Smith',
+                        role: 'viewer',
+                        client_id: 'sterling-associates'
+                    }
+                ];
+
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 1200));
+
+                const user = demoUsers.find(u => u.email === email && u.password === password);
+                return user || null;
+            }
+
+            handleDemoAccess() {
+                this.isAuthenticated = true;
+                this.currentUser = {
+                    id: 'demo',
+                    name: 'Demo User',
+                    role: 'viewer',
+                    client_id: 'demo'
+                };
+                this.saveAuthState(this.currentUser, true);
+                this.showSuccess('Welcome! You are now in demo mode.');
+                
+                // Redirect based on user role
+                setTimeout(() => {
+                    const redirectUrl = this.getRedirectUrl(this.currentUser);
+                    window.location.href = redirectUrl;
+                }, 1500);
+            }
+
+            checkAuthStatus() {
+                const authState = localStorage.getItem('auth_state');
+                if (authState) {
+                    try {
+                        const user = JSON.parse(authState);
+                        // If user is already authenticated, redirect to dashboard
+                        if (user) {
+                            window.location.href = 'overview.html';
+                        }
+                    } catch (error) {
+                        console.error('Error parsing auth state:', error);
+                        localStorage.removeItem('auth_state');
+                    }
+                }
+            }
+
+            saveAuthState(user, rememberMe) {
+                // Always save auth state for the session
+                localStorage.setItem('auth_state', JSON.stringify(user));
+            }
+
+            getRedirectUrl(user) {
+                // Check if there's a stored redirect path
+                const storedRedirect = sessionStorage.getItem('redirect_after_login');
+                if (storedRedirect && storedRedirect !== 'login.html') {
+                    sessionStorage.removeItem('redirect_after_login');
+                    return storedRedirect;
+                }
+
+                // Redirect based on user role
+                if (user.role === 'admin') {
+                    return 'admin-dashboard.html'; // Admin users go to admin dashboard
+                } else {
+                    return 'overview.html'; // Regular users go to strategy dashboard
+                }
+            }
+
+            setLoading(loading) {
+                const btn = document.getElementById('loginBtn');
+                const btnText = document.getElementById('loginBtnText');
+                const spinner = document.getElementById('loginSpinner');
+
+                if (loading) {
+                    btn.disabled = true;
+                    btnText.classList.add('hidden');
+                    spinner.classList.remove('hidden');
+                } else {
+                    btn.disabled = false;
+                    btnText.classList.remove('hidden');
+                    spinner.classList.add('hidden');
+                }
+            }
+
+            showError(message) {
+                const errorDiv = document.getElementById('loginError');
+                const errorText = document.getElementById('loginErrorText');
+                errorText.textContent = message;
+                errorDiv.classList.remove('hidden');
+                
+                // Auto-hide error after 5 seconds
+                setTimeout(() => {
+                    errorDiv.classList.add('hidden');
+                }, 5000);
+            }
+
+            showSuccess(message) {
+                const notification = document.getElementById('successNotification');
+                const messageSpan = document.getElementById('successMessage');
+                messageSpan.textContent = message;
+                notification.classList.remove('hidden');
+            }
+
+            togglePasswordVisibility() {
+                const passwordInput = document.getElementById('password');
+                const toggleBtn = document.getElementById('togglePassword');
+                const icon = toggleBtn.querySelector('i');
+
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.setAttribute('data-lucide', 'eye-off');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.setAttribute('data-lucide', 'eye');
+                }
+                
+                // Re-initialize Lucide icons
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }
+
+            handleForgotPassword() {
+                alert('Password reset functionality will be implemented with Supabase Auth integration.\n\nFor now, please contact your administrator for password assistance.');
+            }
+        }
+
+        // Initialize authentication manager when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new AuthManager();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opportunities - Harbourview AI Strategy Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Left side - Logo and Title -->
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 flex items-center justify-center">
+                            <img src="Harbourview AI logo black transparent.png" 
+                                 alt="Harbourview AI Logo" 
+                                 class="w-8 h-8 object-contain">
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">AI Strategy Report</h1>
+                            <p class="text-sm text-gray-600">Harbourview AI</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right side - Client Selector (Admin Only) and Navigation -->
+                <div class="flex items-center space-x-6">
+                    <!-- Client Selector (Admin Only) -->
+                    <div id="adminClientSelector" class="relative hidden">
+                        <select id="clientSelector" class="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="demo">Sterling & Associates (Demo)</option>
+                            <option value="client-1">Acme Corp</option>
+                            <option value="client-2">TechStart Inc</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+                    </div>
+
+                    <!-- Client Name Display (Regular Users) -->
+                    <div id="clientNameDisplay" class="text-sm font-medium text-gray-700">
+                        <!-- Will be populated by auth guard -->
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <nav class="flex space-x-8">
+                        <a href="overview.html" class="nav-item">Overview</a>
+                        <a href="teams.html" class="nav-item">Teams</a>
+                        <a href="opportunities.html" class="nav-item active">Opportunities</a>
+                        <a href="simulator.html" class="nav-item">Simulator</a>
+                        <a href="roadmap.html" class="nav-item">Roadmap</a>
+                        <a href="admin.html" class="nav-item" id="adminNavLink">Admin</a>
+                    </nav>
+
+                    <!-- User Profile Dropdown -->
+                    <div class="relative">
+                        <button id="profileDropdownBtn" class="flex items-center space-x-3 text-sm hover:text-gray-900 transition-colors">
+                            <div class="text-right">
+                                <div id="userName" class="font-medium text-gray-900"></div>
+                                <div id="userRole" class="text-xs text-gray-500"></div>
+                            </div>
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="user" class="w-4 h-4 text-blue-600"></i>
+                            </div>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 hidden">
+                            <a href="admin-dashboard.html" id="adminDashboardLink" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hidden">
+                                <i data-lucide="settings" class="w-4 h-4 mr-3"></i>
+                                Admin Dashboard
+                            </a>
+                            <a href="admin.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i data-lucide="shield" class="w-4 h-4 mr-3"></i>
+                                Admin Panel
+                            </a>
+                            <hr class="my-1">
+                            <button id="logoutBtn" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i data-lucide="log-out" class="w-4 h-4 mr-3"></i>
+                                Log out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">AI Implementation Opportunities</h2>
+            <p class="text-gray-600">Explore and prioritize AI solutions based on impact and effort analysis</p>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <div class="flex-1">
+                    <input type="text" placeholder="Search opportunities..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                </div>
+                <div class="flex gap-2">
+                    <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        <option>All Teams</option>
+                        <option>Litigation</option>
+                        <option>Client Services</option>
+                        <option>Operations</option>
+                        <option>Research</option>
+                    </select>
+                    <select class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        <option>All Status</option>
+                        <option>High Impact</option>
+                        <option>Medium Impact</option>
+                        <option>Low Impact</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Opportunities Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Opportunity Name</th>
+                            <th>Impacted Teams</th>
+                            <th>Hours Saved</th>
+                            <th>Effort vs Impact</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="font-medium text-gray-900">Document Review Automation</div>
+                                <div class="text-sm text-gray-500">AI-powered contract analysis</div>
+                            </td>
+                            <td>
+                                <div class="flex flex-wrap gap-1">
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Litigation</span>
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Research</span>
+                                </div>
+                            </td>
+                            <td class="font-medium text-teal-600">15 hrs/week</td>
+                            <td>
+                                <div class="w-20 h-2 bg-gray-200 rounded-full">
+                                    <div class="w-16 h-2 bg-teal-500 rounded-full"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">High Impact, Low Effort</div>
+                            </td>
+                            <td><span class="status-badge status-high">Ready</span></td>
+                            <td>
+                                <button class="btn-primary text-sm" onclick="openOpportunityModal('doc-review')">View Details</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="font-medium text-gray-900">Client Communication Bot</div>
+                                <div class="text-sm text-gray-500">Automated scheduling and Q&A</div>
+                            </td>
+                            <td>
+                                <div class="flex flex-wrap gap-1">
+                                    <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">Client Services</span>
+                                </div>
+                            </td>
+                            <td class="font-medium text-teal-600">8 hrs/week</td>
+                            <td>
+                                <div class="w-20 h-2 bg-gray-200 rounded-full">
+                                    <div class="w-12 h-2 bg-yellow-500 rounded-full"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">Medium Impact, Medium Effort</div>
+                            </td>
+                            <td><span class="status-badge status-medium">In Progress</span></td>
+                            <td>
+                                <button class="btn-primary text-sm" onclick="openOpportunityModal('client-bot')">View Details</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="font-medium text-gray-900">Case Research Assistant</div>
+                                <div class="text-sm text-gray-500">AI-powered legal research</div>
+                            </td>
+                            <td>
+                                <div class="flex flex-wrap gap-1">
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Litigation</span>
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Research</span>
+                                </div>
+                            </td>
+                            <td class="font-medium text-teal-600">12 hrs/week</td>
+                            <td>
+                                <div class="w-20 h-2 bg-gray-200 rounded-full">
+                                    <div class="w-14 h-2 bg-teal-500 rounded-full"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">High Impact, Low Effort</div>
+                            </td>
+                            <td><span class="status-badge status-high">Ready</span></td>
+                            <td>
+                                <button class="btn-primary text-sm" onclick="openOpportunityModal('research-assistant')">View Details</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="font-medium text-gray-900">Automated Report Generation</div>
+                                <div class="text-sm text-gray-500">Weekly client and internal reports</div>
+                            </td>
+                            <td>
+                                <div class="flex flex-wrap gap-1">
+                                    <span class="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">Operations</span>
+                                    <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">Client Services</span>
+                                </div>
+                            </td>
+                            <td class="font-medium text-teal-600">6 hrs/week</td>
+                            <td>
+                                <div class="w-20 h-2 bg-gray-200 rounded-full">
+                                    <div class="w-10 h-2 bg-green-500 rounded-full"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">Medium Impact, Low Effort</div>
+                            </td>
+                            <td><span class="status-badge status-medium">Planning</span></td>
+                            <td>
+                                <button class="btn-primary text-sm" onclick="openOpportunityModal('report-gen')">View Details</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="font-medium text-gray-900">Intelligent Document Search</div>
+                                <div class="text-sm text-gray-500">Semantic search across case files</div>
+                            </td>
+                            <td>
+                                <div class="flex flex-wrap gap-1">
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Litigation</span>
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Research</span>
+                                    <span class="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">Operations</span>
+                                </div>
+                            </td>
+                            <td class="font-medium text-teal-600">10 hrs/week</td>
+                            <td>
+                                <div class="w-20 h-2 bg-gray-200 rounded-full">
+                                    <div class="w-18 h-2 bg-teal-500 rounded-full"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">High Impact, Medium Effort</div>
+                            </td>
+                            <td><span class="status-badge status-high">Ready</span></td>
+                            <td>
+                                <button class="btn-primary text-sm" onclick="openOpportunityModal('doc-search')">View Details</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Impact vs Effort Chart -->
+        <div class="mt-8 bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Impact vs Effort Matrix</h3>
+            <div class="relative h-64 bg-gray-50 rounded-lg p-4">
+                <div class="absolute inset-4">
+                    <!-- Chart placeholder - would be replaced with actual chart library -->
+                    <div class="w-full h-full flex items-center justify-center text-gray-500">
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i data-lucide="bar-chart-3" class="w-8 h-8 text-teal-600"></i>
+                            </div>
+                            <div class="text-sm">Interactive Impact vs Effort Matrix</div>
+                            <div class="text-xs text-gray-400 mt-1">Hover over opportunities to see details</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Opportunity Detail Modal -->
+    <div id="opportunityModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-900" id="modalTitle">Document Review Automation</h3>
+                        <p class="text-gray-600 mt-1" id="modalSubtitle">AI-powered contract analysis</p>
+                    </div>
+                    <button onclick="closeOpportunityModal()" class="text-gray-400 hover:text-gray-600">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Left Column -->
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-900 mb-3">Description</h4>
+                            <p class="text-gray-700" id="modalDescription">
+                                Implement AI-powered document review system to automatically analyze contracts, 
+                                identify key terms, flag potential issues, and generate summary reports. This 
+                                solution will significantly reduce manual review time while improving accuracy.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-900 mb-3">Impacted Teams</h4>
+                            <div class="flex flex-wrap gap-2" id="modalTeams">
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">Litigation</span>
+                                <span class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">Research</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-900 mb-3">Key Benefits</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <i data-lucide="check" class="w-4 h-4 text-green-600 mr-2 mt-0.5 flex-shrink-0"></i>
+                                    <span>75% reduction in document review time</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i data-lucide="check" class="w-4 h-4 text-green-600 mr-2 mt-0.5 flex-shrink-0"></i>
+                                    <span>Improved accuracy in issue detection</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i data-lucide="check" class="w-4 h-4 text-green-600 mr-2 mt-0.5 flex-shrink-0"></i>
+                                    <span>Consistent analysis across all documents</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i data-lucide="check" class="w-4 h-4 text-green-600 mr-2 mt-0.5 flex-shrink-0"></i>
+                                    <span>Automated summary generation</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="space-y-6">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-3">Implementation Details</h4>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Timeline:</span>
+                                    <span class="font-medium" id="modalTimeline">4-6 weeks</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Effort Level:</span>
+                                    <span class="font-medium" id="modalEffort">Low</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Hours Saved:</span>
+                                    <span class="font-medium text-teal-600" id="modalHours">15 hrs/week</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">ROI Timeline:</span>
+                                    <span class="font-medium" id="modalROI">3 months</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-900 mb-3">Implementation Steps</h4>
+                            <ol class="space-y-2 text-sm text-gray-700">
+                                <li class="flex items-start">
+                                    <span class="bg-teal-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs mr-3 mt-0.5 flex-shrink-0">1</span>
+                                    <span>Data preparation and document upload</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="bg-teal-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs mr-3 mt-0.5 flex-shrink-0">2</span>
+                                    <span>AI model training and configuration</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="bg-teal-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs mr-3 mt-0.5 flex-shrink-0">3</span>
+                                    <span>Pilot testing with sample documents</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="bg-teal-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs mr-3 mt-0.5 flex-shrink-0">4</span>
+                                    <span>Team training and rollout</span>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-2">Demo & Software</h4>
+                            <p class="text-sm text-gray-700 mb-3">Experience this solution with our interactive demo</p>
+                            <div class="flex gap-2">
+                                <button class="btn-primary text-sm">
+                                    <i data-lucide="play" class="w-4 h-4 mr-1"></i>
+                                    View Demo
+                                </button>
+                                <button class="btn-secondary text-sm">
+                                    <i data-lucide="download" class="w-4 h-4 mr-1"></i>
+                                    Download Brochure
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
+                    <button onclick="closeOpportunityModal()" class="btn-secondary">Close</button>
+                    <button class="btn-primary">
+                        <i data-lucide="plus" class="w-4 h-4 mr-1"></i>
+                        Add to Roadmap
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth-guard.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Profile dropdown functionality
+        function initializeProfileDropdown() {
+            const profileBtn = document.getElementById('profileDropdownBtn');
+            const dropdown = document.getElementById('profileDropdown');
+            const adminDashboardLink = document.getElementById('adminDashboardLink');
+            const adminNavLink = document.getElementById('adminNavLink');
+            
+            // Toggle dropdown
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!profileBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+            
+            // Show/hide admin dashboard link based on user role
+            const authState = localStorage.getItem('auth_state');
+            if (authState) {
+                try {
+                    const user = JSON.parse(authState);
+                    if (user.role === 'admin') {
+                        adminDashboardLink.classList.remove('hidden');
+                    } else {
+                        adminNavLink.style.display = 'none'; // Hide admin nav link for regular users
+                    }
+                } catch (error) {
+                    console.error('Error parsing auth state:', error);
+                }
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeProfileDropdown();
+        });
+    </script>
+</body>
+</html>

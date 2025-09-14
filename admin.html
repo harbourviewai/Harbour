@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Harbourview AI Strategy Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="auth-guard.js"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="settings" class="w-8 h-8 text-blue-600"></i>
+                        </div>
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Redirecting to Admin Panel...</h1>
+            <p class="text-gray-600">Please wait while we determine your access level.</p>
+            <div class="mt-4">
+                <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                        </div>
+                    </div>
+                </div>
+                
+    <script>
+        // Check user role and redirect accordingly
+        document.addEventListener('DOMContentLoaded', () => {
+            const authState = localStorage.getItem('auth_state');
+            
+            if (!authState) {
+                // No auth state, redirect to login
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const user = JSON.parse(authState);
+                
+                if (user.role === 'admin') {
+                    // Admin users can access both admin dashboard and client admin
+                    // For now, redirect to admin dashboard, but they can access client admin via profile dropdown
+                    window.location.href = 'admin-dashboard.html';
+                } else {
+                    // Regular users go to a simple admin page for their client
+                    window.location.href = 'client-admin.html';
+                }
+            } catch (error) {
+                console.error('Error parsing auth state:', error);
+                localStorage.removeItem('auth_state');
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>

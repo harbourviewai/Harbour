@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overview - Harbourview AI Strategy Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="auth-guard.js"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Left side - Logo and Title -->
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 flex items-center justify-center">
+                            <img src="Harbourview AI logo black transparent.png" 
+                                 alt="Harbourview AI Logo" 
+                                 class="w-8 h-8 object-contain">
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">AI Strategy Report</h1>
+                            <p class="text-sm text-gray-600">Harbourview AI</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right side - Client Selector (Admin Only) and Navigation -->
+                <div class="flex items-center space-x-6">
+                    <!-- Client Selector (Admin Only) -->
+                    <div id="adminClientSelector" class="relative hidden">
+                        <select id="clientSelector" class="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="demo">Sterling & Associates (Demo)</option>
+                            <option value="client-1">Acme Corp</option>
+                            <option value="client-2">TechStart Inc</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+                    </div>
+
+                    <!-- Client Name Display (Regular Users) -->
+                    <div id="clientNameDisplay" class="text-sm font-medium text-gray-700">
+                        <!-- Will be populated by auth guard -->
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <nav class="flex space-x-8">
+                        <a href="overview.html" class="nav-item active">Overview</a>
+                        <a href="teams.html" class="nav-item">Teams</a>
+                        <a href="opportunities.html" class="nav-item">Opportunities</a>
+                        <a href="simulator.html" class="nav-item">Simulator</a>
+                        <a href="roadmap.html" class="nav-item">Roadmap</a>
+                        <a href="admin.html" class="nav-item" id="adminNavLink">Admin</a>
+                    </nav>
+
+                    <!-- User Profile Dropdown -->
+                    <div class="relative">
+                        <button id="profileDropdownBtn" class="flex items-center space-x-3 text-sm hover:text-gray-900 transition-colors">
+                            <div class="text-right">
+                                <div id="userName" class="font-medium text-gray-900"></div>
+                                <div id="userRole" class="text-xs text-gray-500"></div>
+                            </div>
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="user" class="w-4 h-4 text-blue-600"></i>
+                            </div>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 hidden">
+                            <a href="admin-dashboard.html" id="adminDashboardLink" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hidden">
+                                <i data-lucide="settings" class="w-4 h-4 mr-3"></i>
+                                Admin Dashboard
+                            </a>
+                            <a href="admin.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i data-lucide="shield" class="w-4 h-4 mr-3"></i>
+                                Admin Panel
+                            </a>
+                            <hr class="my-1">
+                            <button id="logoutBtn" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i data-lucide="log-out" class="w-4 h-4 mr-3"></i>
+                                Log out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Main Content Card -->
+        <div class="bg-gradient-to-br from-blue-700 to-blue-600 rounded-2xl shadow-lg p-8 mb-8">
+            <!-- Client Info Header -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="briefcase" class="w-5 h-5 text-white"></i>
+                        <span class="text-white font-medium">Legal Services</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="calendar" class="w-5 h-5 text-white"></i>
+                        <span class="text-white font-medium" id="currentDate"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client Name -->
+            <h1 class="text-4xl font-bold text-white mb-4">Sterling & Associates</h1>
+            
+            <!-- Description -->
+            <p class="text-white text-lg mb-8 leading-relaxed">
+                AI integration transforms Sterling & Associates from traditional law practice to tech-enabled legal powerhouse.
+            </p>
+
+            <!-- Strategic Objectives -->
+            <div>
+                <h2 class="text-xl font-bold text-white mb-4">Strategic Objectives:</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white bg-opacity-20 rounded-xl p-4">
+                        <div class="flex items-center mb-2">
+                            <div class="w-6 h-6 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                                <i data-lucide="trending-down" class="w-3 h-3 text-red-600"></i>
+                            </div>
+                            <h3 class="font-semibold text-white text-sm">Reduce Inefficiencies</h3>
+                        </div>
+                        <p class="text-white text-xs opacity-90">Streamline workflows and eliminate redundant processes</p>
+                    </div>
+                    
+                    <div class="bg-white bg-opacity-20 rounded-xl p-4">
+                        <div class="flex items-center mb-2">
+                            <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                <i data-lucide="zap" class="w-3 h-3 text-blue-600"></i>
+                            </div>
+                            <h3 class="font-semibold text-white text-sm">Accelerate Research</h3>
+                        </div>
+                        <p class="text-white text-xs opacity-90">Faster case research and document analysis</p>
+                    </div>
+                    
+                    <div class="bg-white bg-opacity-20 rounded-xl p-4">
+                        <div class="flex items-center mb-2">
+                            <div class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                <i data-lucide="users" class="w-3 h-3 text-green-600"></i>
+                            </div>
+                            <h3 class="font-semibold text-white text-sm">Improve Client Experience</h3>
+                        </div>
+                        <p class="text-white text-xs opacity-90">Enhanced communication and faster response times</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vision Banner -->
+        <div class="bg-gradient-to-br from-green-600 to-green-500 rounded-2xl shadow-lg p-8 text-center">
+            <h2 class="text-2xl font-bold text-white mb-6">
+                Vision: Become the premier AI-enhanced law firm delivering faster, more accurate legal services
+            </h2>
+            <div class="flex justify-center space-x-4">
+                <a href="opportunities.html" class="bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-block">
+                    Explore Opportunities
+                </a>
+                <a href="simulator.html" class="bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-block">
+                    Run Strategy Simulator
+                </a>
+            </div>
+        </div>
+
+
+        <!-- Key Insights -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Key Insights</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 text-center">
+                    <div class="text-3xl font-bold text-teal-600 mb-2">73%</div>
+                    <div class="text-sm text-gray-600">Time Wasted on Admin Tasks</div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 text-center">
+                    <div class="text-3xl font-bold text-orange-600 mb-2">18.5</div>
+                    <div class="text-sm text-gray-600">Hours Lost to Admin Weekly</div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 text-center">
+                    <div class="text-3xl font-bold text-purple-600 mb-2">42%</div>
+                    <div class="text-sm text-gray-600">Communication Challenges</div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">89%</div>
+                    <div class="text-sm text-gray-600">Process Automation Potential</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expected Impact -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Expected Impact</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 text-center">
+                    <div class="flex items-center justify-center mb-3">
+                        <i data-lucide="clock" class="w-8 h-8 text-green-600"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900 mb-2">37h</div>
+                    <div class="text-sm text-gray-600">Weekly Time Saved</div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 text-center">
+                    <div class="flex items-center justify-center mb-3">
+                        <i data-lucide="target" class="w-8 h-8 text-blue-600"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900 mb-2">8.4/10</div>
+                    <div class="text-sm text-gray-600">Avg Impact Score</div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 text-center">
+                    <div class="flex items-center justify-center mb-3">
+                        <i data-lucide="users" class="w-8 h-8 text-green-600"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900 mb-2">4</div>
+                    <div class="text-sm text-gray-600">Teams Impacted</div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 text-center">
+                    <div class="flex items-center justify-center mb-3">
+                        <i data-lucide="trending-up" class="w-8 h-8 text-yellow-600"></i>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900 mb-2">5</div>
+                    <div class="text-sm text-gray-600">Top Opportunities</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Opportunity Analysis -->
+        <div class="mt-8">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">Opportunity Analysis</h2>
+                    <p class="text-gray-600 mt-1">Visualize impact vs effort for all opportunities. Click any dot or hover for 2 seconds to see details.</p>
+                </div>
+                <a href="opportunities.html" class="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors">
+                    Explore All →
+                </a>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Opportunity Impact vs Time Saved</h3>
+                
+                <!-- Legend -->
+                <div class="flex items-center space-x-6 mb-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span class="text-sm text-gray-600">Low Effort</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                        <span class="text-sm text-gray-600">Medium Effort</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                        <span class="text-sm text-gray-600">High Effort</span>
+                    </div>
+                </div>
+
+                <!-- Interactive Scatter Plot -->
+                <div class="relative bg-gray-50 rounded-lg p-4" style="height: 500px;">
+                    <svg id="scatterPlot" class="w-full h-full" viewBox="0 0 500 250" preserveAspectRatio="xMidYMid meet">
+                        <!-- Background -->
+                        <rect width="100%" height="100%" fill="#f9fafb" />
+                        
+                        <!-- Vertical grid lines (x-axis: 0, 3, 6, 10) -->
+                        <line x1="25" y1="25" x2="25" y2="225" stroke="#d1d5db" stroke-width="1"/>
+                        <line x1="175" y1="25" x2="175" y2="225" stroke="#d1d5db" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
+                        <line x1="325" y1="25" x2="325" y2="225" stroke="#d1d5db" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
+                        
+                        <!-- Horizontal grid lines (y-axis: 0, 3, 6, 9, 12) -->
+                        <line x1="25" y1="225" x2="475" y2="225" stroke="#d1d5db" stroke-width="1"/>
+                        <line x1="25" y1="175" x2="475" y2="175" stroke="#d1d5db" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
+                        <line x1="25" y1="125" x2="475" y2="125" stroke="#d1d5db" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
+                        <line x1="25" y1="75" x2="475" y2="75" stroke="#d1d5db" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>
+                        
+                        <!-- X-axis values: 0, 3, 6, 10 -->
+                        <text x="25" y="240" text-anchor="start" class="text-xs fill-gray-500">0</text>
+                        <text x="175" y="240" text-anchor="middle" class="text-xs fill-gray-500">3</text>
+                        <text x="325" y="240" text-anchor="middle" class="text-xs fill-gray-500">6</text>
+                        <text x="475" y="240" text-anchor="end" class="text-xs fill-gray-500">10</text>
+
+                        
+                        <!-- Y-axis values: 0, 3, 6, 9, 12 -->
+                        <text x="0" y="230" text-anchor="start" class="text-xs fill-gray-500">0</text>
+                        <text x="0" y="180" text-anchor="start" class="text-xs fill-gray-500">3</text>
+                        <text x="0" y="130" text-anchor="start" class="text-xs fill-gray-500">6</text>
+                        <text x="0" y="80" text-anchor="start" class="text-xs fill-gray-500">9</text>
+                        <text x="0" y="30" text-anchor="start" class="text-xs fill-gray-500">12</text>
+                        
+                        <!-- Interactive dots will be added by JavaScript -->
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Recommended Opportunities -->
+        <div class="mt-8">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">Top Recommended Opportunities</h2>
+                    <p class="text-gray-600 mt-1">AI solutions with the highest impact and quickest implementation</p>
+                </div>
+                <a href="opportunities.html" class="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors flex items-center space-x-2">
+                    <span>View All</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+            
+            <!-- Opportunity Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- AI Document Review Assistant -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="showOpportunityModal('document-review')">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">AI Document Review Assistant</h3>
+                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium">high</span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-6 mb-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">9/10</div>
+                            <div class="text-sm text-gray-600">Impact Score</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600">10h</div>
+                            <div class="text-sm text-gray-600">Weekly Time Saved</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="text-sm text-gray-700">• 75% faster document review and discovery process</div>
+                        <div class="text-sm text-gray-700">• Improved accuracy in identifying relevant documents</div>
+                    </div>
+                    
+                    <div class="text-xs text-gray-500">Double-click for detailed view</div>
+                </div>
+
+                <!-- Automated Time Tracking System -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="showOpportunityModal('time-tracking')">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Automated Time Tracking System</h3>
+                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium">medium</span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-6 mb-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">8/10</div>
+                            <div class="text-sm text-gray-600">Impact Score</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600">7h</div>
+                            <div class="text-sm text-gray-600">Weekly Time Saved</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="text-sm text-gray-700">• Accurate billable hour capture without manual entry</div>
+                        <div class="text-sm text-gray-700">• Improved billing accuracy and client transparency</div>
+                    </div>
+                    
+                    <div class="text-xs text-gray-500">Double-click for detailed view</div>
+                </div>
+
+                <!-- Legal Research AI Assistant -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="showOpportunityModal('legal-research')">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Legal Research AI Assistant</h3>
+                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium">high</span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-6 mb-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">9/10</div>
+                            <div class="text-sm text-gray-600">Impact Score</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600">8h</div>
+                            <div class="text-sm text-gray-600">Weekly Time Saved</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="text-sm text-gray-700">• 90% faster legal precedent research</div>
+                        <div class="text-sm text-gray-700">• More comprehensive case law analysis</div>
+                    </div>
+                    
+                    <div class="text-xs text-gray-500">Double-click for detailed view</div>
+                </div>
+
+                <!-- Contract Analysis Engine -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="showOpportunityModal('contract-analysis')">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Contract Analysis Engine</h3>
+                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-medium">high</span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-6 mb-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">8/10</div>
+                            <div class="text-sm text-gray-600">Impact Score</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600">6h</div>
+                            <div class="text-sm text-gray-600">Weekly Time Saved</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="text-sm text-gray-700">• Automated risk assessment and clause analysis</div>
+                        <div class="text-sm text-gray-700">• Standardized contract review and reporting</div>
+                    </div>
+                    
+                    <div class="text-xs text-gray-500">Double-click for detailed view</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI-Generated Team Insights -->
+        <div class="mt-8">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">AI-Generated Team Insights</h2>
+            </div>
+            
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <!-- Total Insights -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+                    <div class="flex items-center justify-center mb-3">
+                        <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                            <i data-lucide="brain" class="w-6 h-6 text-blue-600"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900 mb-1">7</div>
+                    <div class="text-sm text-gray-600">Total Insights</div>
+                </div>
+                
+                <!-- Pain Points -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+                    <div class="flex items-center justify-center mb-3">
+                        <div class="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
+                            <i data-lucide="alert-triangle" class="w-6 h-6 text-yellow-600"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900 mb-1">3</div>
+                    <div class="text-sm text-gray-600">Pain Points</div>
+                </div>
+                
+                <!-- Opportunities -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+                    <div class="flex items-center justify-center mb-3">
+                        <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+                            <i data-lucide="trending-up" class="w-6 h-6 text-green-600"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900 mb-1">0</div>
+                    <div class="text-sm text-gray-600">Opportunities</div>
+                </div>
+                
+                <!-- Teams Analyzed -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+                    <div class="flex items-center justify-center mb-3">
+                        <div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
+                            <i data-lucide="users" class="w-6 h-6 text-purple-600"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold text-gray-900 mb-1">4</div>
+                    <div class="text-sm text-gray-600">Teams Analyzed</div>
+                </div>
+            </div>
+            
+            <!-- Team Analysis Overview -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center mb-6">
+                    <i data-lucide="users" class="w-5 h-5 text-gray-600 mr-2"></i>
+                    <h3 class="text-lg font-semibold text-gray-900">Team Analysis Overview</h3>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- Corporate Law Team -->
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900 mb-1">Corporate Law Team</h4>
+                            <p class="text-sm text-gray-600">2 insights generated</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="text-right">
+                                <div class="text-sm text-gray-600 mb-1">Confidence: 92%</div>
+                                <div class="w-20 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 92%"></div>
+                                </div>
+                            </div>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                Analyzed
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Litigation Team -->
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900 mb-1">Litigation Team</h4>
+                            <p class="text-sm text-gray-600">2 insights generated</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="text-right">
+                                <div class="text-sm text-gray-600 mb-1">Confidence: 94%</div>
+                                <div class="w-20 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 94%"></div>
+                                </div>
+                            </div>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                Analyzed
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Client Services Team -->
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900 mb-1">Client Services Team</h4>
+                            <p class="text-sm text-gray-600">2 insights generated</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="text-right">
+                                <div class="text-sm text-gray-600 mb-1">Confidence: 90%</div>
+                                <div class="w-20 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 90%"></div>
+                                </div>
+                            </div>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                Analyzed
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Business Development Team -->
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900 mb-1">Business Development Team</h4>
+                            <p class="text-sm text-gray-600">1 insights generated</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="text-right">
+                                <div class="text-sm text-gray-600 mb-1">Confidence: 88%</div>
+                                <div class="w-20 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 88%"></div>
+                                </div>
+                            </div>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                Analyzed
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Highest Confidence Insights -->
+        <div class="mt-8">
+            <div class="flex items-center mb-6">
+                <i data-lucide="target" class="w-5 h-5 text-gray-600 mr-2"></i>
+                <h2 class="text-2xl font-bold text-gray-900">Highest Confidence Insights</h2>
+            </div>
+            
+            <div class="space-y-4">
+                <!-- Insight 1: Document Discovery Volume Unmanageable -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
+                                <i data-lucide="alert-triangle" class="w-4 h-4 text-red-600"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-gray-900 mb-2">Document Discovery Volume Unmanageable</h3>
+                            <p class="text-gray-600 text-sm mb-3">Current class action case has 2.8M documents requiring 8+ months of manual review by 10-person team</p>
+                            <div class="flex items-center justify-between">
+                                <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium">Litigation Team</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-16 bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 96%"></div>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-900">96%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insight 2: Manual Document Review Overwhelming Attorneys -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
+                                <i data-lucide="alert-triangle" class="w-4 h-4 text-red-600"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-gray-900 mb-2">Manual Document Review Overwhelming Attorneys</h3>
+                            <p class="text-gray-600 text-sm mb-3">Senior attorneys spend 8-10 hours per deal reviewing 200+ documents manually, representing poor use of $400/hour resources</p>
+                            <div class="flex items-center justify-between">
+                                <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium">Corporate Law Team</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-16 bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 94%"></div>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-900">94%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insight 3: Legal Research Consuming Excessive Billable Hours -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                                <i data-lucide="info" class="w-4 h-4 text-blue-600"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-gray-900 mb-2">Legal Research Consuming Excessive Billable Hours</h3>
+                            <p class="text-gray-600 text-sm mb-3">Attorneys spend 20+ hours per motion on research that could be significantly automated with AI assistance</p>
+                            <div class="flex items-center justify-between">
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">Litigation Team</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-16 bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 92%"></div>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-900">92%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insight 4: Inconsistent Time Tracking Leading to Billing Disputes -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
+                                <i data-lucide="alert-triangle" class="w-4 h-4 text-red-600"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-gray-900 mb-2">Inconsistent Time Tracking Leading to Billing Disputes</h3>
+                            <p class="text-gray-600 text-sm mb-3">Attorneys inconsistent time tracking causes 20% of bills to generate disputes and delays payment collection to 65 days</p>
+                            <div class="flex items-center justify-between">
+                                <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium">Client Services Team</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-16 bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 91%"></div>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-900">91%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insight 5: Contract Template Inconsistency Across Team -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                                <i data-lucide="info" class="w-4 h-4 text-blue-600"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-gray-900 mb-2">Contract Template Inconsistency Across Team</h3>
+                            <p class="text-gray-600 text-sm mb-3">Different partners use different language for similar provisions, creating inconsistent work product and client confusion</p>
+                            <div class="flex items-center justify-between">
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">Corporate Law Team</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-16 bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 89%"></div>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-900">89%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insight 6: Clients Expect Real-Time Transparency -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                                <i data-lucide="info" class="w-4 h-4 text-blue-600"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-gray-900 mb-2">Clients Expect Real-Time Transparency Like Other Industries</h3>
+                            <p class="text-gray-600 text-sm mb-3">Clients accustomed to real-time tracking from other services expect similar transparency from law firm</p>
+                            <div class="flex items-center justify-between">
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">Client Services Team</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-16 bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 87%"></div>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-900">87%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Opportunity Popup -->
+        <div id="opportunityPopup" class="fixed bg-white rounded-xl shadow-xl border border-gray-200 max-w-sm w-80 z-50 hidden transform transition-all duration-200 scale-95 opacity-0" style="left: 50px; top: 50px;">
+            <div class="p-4">
+                <!-- Popup Header -->
+                <div class="flex items-center justify-between mb-3">
+                    <h3 id="popupTitle" class="text-lg font-semibold text-gray-900">Opportunity Details</h3>
+                    <button id="closePopup" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                
+                <!-- Popup Content -->
+                <div class="space-y-3">
+                    <!-- Impact & Time Saved -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-blue-50 rounded-lg p-2">
+                            <div class="text-xs text-blue-600 font-medium">Impact Score</div>
+                            <div id="popupImpact" class="text-lg font-bold text-blue-900">0</div>
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-2">
+                            <div class="text-xs text-green-600 font-medium">Hours Saved</div>
+                            <div id="popupTimeSaved" class="text-lg font-bold text-green-900">0</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Effort Level -->
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs text-gray-600">Effort:</span>
+                        <span id="popupEffort" class="px-2 py-1 rounded-full text-xs font-medium"></span>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div>
+                        <div class="text-xs text-gray-600 mb-1">Description</div>
+                        <div id="popupDescription" class="text-xs text-gray-800 bg-gray-50 rounded-lg p-2"></div>
+                    </div>
+                    
+                    <!-- Key Benefits -->
+                    <div>
+                        <div class="text-xs text-gray-600 mb-1">Key Benefits</div>
+                        <ul id="popupBenefits" class="text-xs text-gray-800 space-y-1"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Opportunity Modal -->
+        <div id="opportunityDetailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full mx-4 transform transition-all duration-300 scale-95 opacity-0" id="detailModalContent">
+                <div class="p-8">
+                    <!-- Modal Header -->
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 id="detailModalTitle" class="text-2xl font-bold text-gray-900">Opportunity Details</h3>
+                            <div class="mt-2">
+                                <span class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">Top Recommendation</span>
+                            </div>
+                        </div>
+                        <button id="closeDetailModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <i data-lucide="x" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Key Metrics Row -->
+                    <div class="grid grid-cols-4 gap-6 mb-8">
+                        <!-- Impact Score -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 text-center">
+                            <div class="flex items-center justify-center mb-2">
+                                <i data-lucide="target" class="w-6 h-6 text-purple-600"></i>
+                            </div>
+                            <div id="detailImpactScore" class="text-3xl font-bold text-gray-900 mb-1">9/10</div>
+                            <div class="text-sm text-gray-600">Impact Score</div>
+                        </div>
+                        
+                        <!-- Weekly Time Saved -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 text-center">
+                            <div class="flex items-center justify-center mb-2">
+                                <i data-lucide="clock" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                            <div id="detailTimeSaved" class="text-3xl font-bold text-gray-900 mb-1">10h</div>
+                            <div class="text-sm text-gray-600">Weekly Time Saved</div>
+                        </div>
+                        
+                        <!-- Implementation Effort -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 text-center">
+                            <div class="flex items-center justify-center mb-2">
+                                <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
+                            </div>
+                            <div id="detailImplementationEffort" class="text-3xl font-bold text-red-600 mb-1">High</div>
+                            <div class="text-sm text-gray-600">Implementation Effort</div>
+                        </div>
+                        
+                        <!-- Priority Score -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 text-center">
+                            <div class="flex items-center justify-center mb-2">
+                                <i data-lucide="trending-up" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                            <div id="detailPriorityScore" class="text-3xl font-bold text-green-600 mb-1">82%</div>
+                            <div class="text-sm text-gray-600">Priority Score</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Solution Overview -->
+                    <div class="mb-8">
+                        <div class="flex items-center mb-4">
+                            <i data-lucide="lightbulb" class="w-5 h-5 text-yellow-500 mr-2"></i>
+                            <h4 class="text-lg font-semibold text-gray-900">Solution Overview</h4>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p id="detailSolutionOverview" class="text-gray-700">AI system that automatically reviews, categorizes, and flags relevant documents for litigation discovery and due diligence processes.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Impacted Teams -->
+                    <div>
+                        <div class="flex items-center mb-4">
+                            <i data-lucide="users" class="w-5 h-5 text-blue-500 mr-2"></i>
+                            <h4 class="text-lg font-semibold text-gray-900">Impacted Teams</h4>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Team 1 -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                <h5 id="detailTeam1Name" class="font-semibold text-gray-900 mb-3">Corporate Law Team</h5>
+                                <ul id="detailTeam1Points" class="space-y-2">
+                                    <li class="flex items-start">
+                                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span class="text-sm text-gray-700">Manual contract review and redlining processes</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span class="text-sm text-gray-700">Time-intensive due diligence document analysis</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span class="text-sm text-gray-700">Inconsistent contract template usage across deals</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Team 2 -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                <h5 id="detailTeam2Name" class="font-semibold text-gray-900 mb-3">Litigation Team</h5>
+                                <ul id="detailTeam2Points" class="space-y-2">
+                                    <li class="flex items-start">
+                                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span class="text-sm text-gray-700">Overwhelming document discovery and review volumes</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span class="text-sm text-gray-700">Manual legal research consuming excessive billable hours</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                                        <span class="text-sm text-gray-700">Inefficient deposition scheduling and case timeline management</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script type="module">
+        import OverviewService from './overview-service.js';
+        
+        // Initialize the overview service
+        const overviewService = new OverviewService();
+        
+        // Make it globally available for debugging
+        window.overviewService = overviewService;
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', async () => {
+            await overviewService.init();
+        });
+    </script>
+    <script>
+        // Update date dynamically
+        function updateDate() {
+            const now = new Date();
+            const options = { 
+                month: 'numeric', 
+                day: 'numeric', 
+                year: 'numeric' 
+            };
+            const formattedDate = now.toLocaleDateString('en-US', options);
+            document.getElementById('currentDate').textContent = formattedDate;
+        }
+        
+        // Update date on page load
+        updateDate();
+        
+        // Update date every minute to ensure it stays current
+        setInterval(updateDate, 60000);
+        
+        // Interactive Scatter Plot
+        function createScatterPlot() {
+            const svg = document.getElementById('scatterPlot');
+            if (!svg) return;
+            
+            // Use dynamic opportunities if available, otherwise fallback to demo data
+            let opportunities = window.dynamicOpportunities || [
+                { 
+                    name: "Document Automation", 
+                    impact: 2.5, 
+                    timeSaved: 0, 
+                    effort: "low", 
+                    color: "green",
+                    description: "Automate document generation and processing to reduce manual data entry and improve accuracy.",
+                    benefits: ["Reduces manual errors", "Saves 2-3 hours per week", "Improves document consistency", "Enhances client satisfaction"]
+                },
+                { 
+                    name: "Case Management", 
+                    impact: 10, 
+                    timeSaved: 0, 
+                    effort: "low", 
+                    color: "green",
+                    description: "Centralized case management system with AI-powered insights and automated workflows.",
+                    benefits: ["Centralizes case information", "Automates routine tasks", "Provides case insights", "Improves team collaboration"]
+                },
+                { 
+                    name: "Billing Automation", 
+                    impact: 10, 
+                    timeSaved: 12, 
+                    effort: "medium", 
+                    color: "yellow",
+                    description: "Automated time tracking and billing system with AI-powered time entry suggestions.",
+                    benefits: ["Eliminates manual time entry", "Reduces billing errors", "Increases billable hours", "Improves cash flow"]
+                },
+                { 
+                    name: "Legal Research AI", 
+                    impact: 2.5, 
+                    timeSaved: 6, 
+                    effort: "medium", 
+                    color: "yellow",
+                    description: "AI-powered legal research tool that provides relevant case law and precedents quickly.",
+                    benefits: ["Accelerates research process", "Improves research accuracy", "Reduces research costs", "Enhances case preparation"]
+                },
+                { 
+                    name: "Time Tracking", 
+                    impact: 5, 
+                    timeSaved: 0, 
+                    effort: "high", 
+                    color: "red",
+                    description: "Advanced time tracking system with AI-powered categorization and productivity insights.",
+                    benefits: ["Provides productivity insights", "Improves time allocation", "Identifies inefficiencies", "Enhances project management"]
+                },
+                { 
+                    name: "Workflow Optimization", 
+                    impact: 2.5, 
+                    timeSaved: 3, 
+                    effort: "high", 
+                    color: "red",
+                    description: "AI-driven workflow analysis and optimization to streamline processes and reduce bottlenecks.",
+                    benefits: ["Identifies process bottlenecks", "Optimizes team workflows", "Reduces redundant tasks", "Improves overall efficiency"]
+                }
+            ];
+            
+            // Convert data to SVG coordinates (0-10 impact, 0-12 time saved)
+            function dataToCoords(impact, timeSaved) {
+                const x = 25 + (impact / 10) * 450; // 25 to 475 (0-10 range)
+                const y = 225 - ((timeSaved / 12) * 200); // 225 to 25 (0-12 range, flipped)
+                return { x, y };
+            }
+            
+            // Create draggable dots
+            opportunities.forEach((opp, index) => {
+                const coords = dataToCoords(opp.impact, opp.timeSaved);
+                const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                
+                dot.setAttribute('cx', coords.x);
+                dot.setAttribute('cy', coords.y);
+                dot.setAttribute('r', '3');
+                dot.setAttribute('fill', opp.color === 'green' ? '#10b981' : opp.color === 'yellow' ? '#f59e0b' : '#ef4444');
+                dot.setAttribute('stroke', '#ffffff');
+                dot.setAttribute('stroke-width', '1.0');
+                dot.setAttribute('cursor', 'move');
+                dot.setAttribute('data-index', index);
+                
+                // No tooltip needed - information is in the modal
+                
+                // Make draggable
+                let isDragging = false;
+                let startX, startY, startCx, startCy;
+                
+                const startDrag = (e) => {
+                    e.preventDefault();
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    startCx = parseFloat(dot.getAttribute('cx'));
+                    startCy = parseFloat(dot.getAttribute('cy'));
+                    dot.style.opacity = '0.7';
+                    dot.style.cursor = 'grabbing';
+                };
+                
+                const drag = (e) => {
+                    if (!isDragging) return;
+                    e.preventDefault();
+                    
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+                    
+                    // Convert mouse delta to SVG coordinates
+                    const svgRect = svg.getBoundingClientRect();
+                    const scaleX = 500 / svgRect.width;
+                    const scaleY = 250 / svgRect.height;
+                    
+                    let newX = startCx + (deltaX * scaleX);
+                    let newY = startCy + (deltaY * scaleY);
+                    
+                    // Constrain to plot area (25-475 x, 25-225 y)
+                    newX = Math.max(25, Math.min(475, newX));
+                    newY = Math.max(25, Math.min(225, newY));
+                    
+                    dot.setAttribute('cx', newX);
+                    dot.setAttribute('cy', newY);
+                    
+                    // Update data (0-10 impact, 0-12 time saved)
+                    const newImpact = Math.round(((newX - 25) / 450) * 10 * 10) / 10; // 0-10 range
+                    const newTimeSaved = Math.round(((225 - newY) / 200) * 12 * 10) / 10; // 0-12 range, flipped
+                    
+                    opportunities[index].impact = Math.max(0, Math.min(10, newImpact));
+                    opportunities[index].timeSaved = Math.max(0, Math.min(12, newTimeSaved));
+                    
+                    // Update tooltip
+                    title.textContent = `${opp.name}\nImpact: ${opportunities[index].impact}/10\nTime Saved: ${opportunities[index].timeSaved}h\nEffort: ${opp.effort}`;
+                };
+                
+                const endDrag = (e) => {
+                    if (isDragging) {
+                        isDragging = false;
+                        dot.style.opacity = '1';
+                        dot.style.cursor = 'move';
+                    }
+                };
+                
+                // Modal functionality
+                let hoverTimeout;
+                
+                const showPopup = (opp, dot) => {
+                    document.getElementById('popupTitle').textContent = opp.name;
+                    document.getElementById('popupImpact').textContent = opp.impact;
+                    document.getElementById('popupTimeSaved').textContent = `${opp.timeSaved}h`;
+                    
+                    const effortElement = document.getElementById('popupEffort');
+                    effortElement.textContent = opp.effort.charAt(0).toUpperCase() + opp.effort.slice(1);
+                    effortElement.className = `px-2 py-1 rounded-full text-xs font-medium ${
+                        opp.effort === 'low' ? 'bg-green-100 text-green-800' :
+                        opp.effort === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                    }`;
+                    
+                    document.getElementById('popupDescription').textContent = opp.description;
+                    
+                    const benefitsList = document.getElementById('popupBenefits');
+                    benefitsList.innerHTML = '';
+                    opp.benefits.forEach(benefit => {
+                        const li = document.createElement('li');
+                        li.textContent = `• ${benefit}`;
+                        benefitsList.appendChild(li);
+                    });
+                    
+                    const popup = document.getElementById('opportunityPopup');
+                    const svg = document.getElementById('scatterPlot');
+                    const svgRect = svg.getBoundingClientRect();
+                    
+                    // Get dot position in SVG coordinates
+                    const dotX = parseFloat(dot.getAttribute('cx'));
+                    const dotY = parseFloat(dot.getAttribute('cy'));
+                    
+                    // Convert SVG coordinates to screen coordinates
+                    const scaleX = svgRect.width / 500;
+                    const scaleY = svgRect.height / 250;
+                    
+                    const screenX = svgRect.left + (dotX * scaleX);
+                    const screenY = svgRect.top + (dotY * scaleY);
+                    
+                    // Position popup next to the dot
+                    popup.style.left = `${screenX + 20}px`;
+                    popup.style.top = `${screenY - 20}px`;
+                    
+                    // Remove hidden class and reset animation classes
+                    popup.classList.remove('hidden', 'scale-95', 'opacity-0');
+                    popup.classList.add('scale-100', 'opacity-100');
+                };
+                
+                const hidePopup = () => {
+                    const popup = document.getElementById('opportunityPopup');
+                    
+                    popup.classList.remove('scale-100', 'opacity-100');
+                    popup.classList.add('scale-95', 'opacity-0');
+                    
+                    setTimeout(() => {
+                        popup.classList.add('hidden');
+                    }, 200);
+                };
+                
+                // Click to show popup
+                dot.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showPopup(opp, dot);
+                });
+                
+                // Hover for 2 seconds to show popup
+                dot.addEventListener('mouseenter', () => {
+                    hoverTimeout = setTimeout(() => {
+                        showPopup(opp, dot);
+                    }, 2000);
+                });
+                
+                dot.addEventListener('mouseleave', () => {
+                    clearTimeout(hoverTimeout);
+                });
+                
+                // Event listeners for dragging
+                dot.addEventListener('mousedown', startDrag);
+                dot.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    startDrag(e.touches[0]);
+                });
+                
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    drag(e.touches[0]);
+                });
+                
+                document.addEventListener('mouseup', endDrag);
+                document.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    endDrag(e);
+                });
+                
+                svg.appendChild(dot);
+            });
+        }
+        
+        // Popup close functionality
+        function initializePopup() {
+            const popup = document.getElementById('opportunityPopup');
+            const closePopup = document.getElementById('closePopup');
+            
+            const hidePopup = () => {
+                popup.classList.remove('scale-100', 'opacity-100');
+                popup.classList.add('scale-95', 'opacity-0');
+                
+                setTimeout(() => {
+                    popup.classList.add('hidden');
+                }, 200);
+            };
+            
+            // Close popup when clicking close button
+            closePopup.addEventListener('click', hidePopup);
+            
+            // Close popup when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!popup.contains(e.target) && !popup.classList.contains('hidden')) {
+                    // Check if click is not on a dot
+                    const isDotClick = e.target.tagName === 'circle' && e.target.closest('#scatterPlot');
+                    if (!isDotClick) {
+                        hidePopup();
+                    }
+                }
+            });
+            
+            // Close popup with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !popup.classList.contains('hidden')) {
+                    hidePopup();
+                }
+            });
+        }
+        
+        // Opportunity data for detailed modals
+        const opportunityData = {
+            'document-review': {
+                title: 'AI Document Review Assistant',
+                impactScore: '9/10',
+                timeSaved: '10h',
+                implementationEffort: 'High',
+                priorityScore: '82%',
+                solutionOverview: 'AI system that automatically reviews, categorizes, and flags relevant documents for litigation discovery and due diligence processes.',
+                teams: [
+                    {
+                        name: 'Corporate Law Team',
+                        points: [
+                            'Manual contract review and redlining processes',
+                            'Time-intensive due diligence document analysis',
+                            'Inconsistent contract template usage across deals'
+                        ]
+                    },
+                    {
+                        name: 'Litigation Team',
+                        points: [
+                            'Overwhelming document discovery and review volumes',
+                            'Manual legal research consuming excessive billable hours',
+                            'Inefficient deposition scheduling and case timeline management'
+                        ]
+                    }
+                ]
+            },
+            'time-tracking': {
+                title: 'Automated Time Tracking System',
+                impactScore: '8/10',
+                timeSaved: '7h',
+                implementationEffort: 'Medium',
+                priorityScore: '75%',
+                solutionOverview: 'AI-powered time tracking system that automatically captures billable hours and categorizes work activities without manual entry.',
+                teams: [
+                    {
+                        name: 'Billing Team',
+                        points: [
+                            'Manual time entry leading to lost billable hours',
+                            'Inconsistent time tracking across attorneys',
+                            'Time-consuming invoice preparation and review'
+                        ]
+                    },
+                    {
+                        name: 'All Practice Areas',
+                        points: [
+                            'Administrative burden of time tracking',
+                            'Difficulty tracking non-billable activities',
+                            'Client billing disputes due to time discrepancies'
+                        ]
+                    }
+                ]
+            },
+            'legal-research': {
+                title: 'Legal Research AI Assistant',
+                impactScore: '9/10',
+                timeSaved: '8h',
+                implementationEffort: 'High',
+                priorityScore: '88%',
+                solutionOverview: 'Advanced AI research tool that provides comprehensive case law analysis, precedent identification, and legal argument suggestions.',
+                teams: [
+                    {
+                        name: 'Litigation Team',
+                        points: [
+                            'Manual legal research consuming excessive billable hours',
+                            'Risk of missing relevant precedents',
+                            'Time-intensive case law analysis and synthesis'
+                        ]
+                    },
+                    {
+                        name: 'Corporate Law Team',
+                        points: [
+                            'Complex regulatory research requirements',
+                            'Keeping up with changing compliance standards',
+                            'Due diligence research across multiple jurisdictions'
+                        ]
+                    }
+                ]
+            },
+            'contract-analysis': {
+                title: 'Contract Analysis Engine',
+                impactScore: '8/10',
+                timeSaved: '6h',
+                implementationEffort: 'High',
+                priorityScore: '79%',
+                solutionOverview: 'AI-powered contract analysis system that automatically identifies risks, clauses, and compliance issues in legal documents.',
+                teams: [
+                    {
+                        name: 'Corporate Law Team',
+                        points: [
+                            'Manual contract review and redlining processes',
+                            'Risk assessment across multiple contract types',
+                            'Standardizing contract terms and conditions'
+                        ]
+                    },
+                    {
+                        name: 'Compliance Team',
+                        points: [
+                            'Ensuring regulatory compliance across contracts',
+                            'Monitoring contract performance and obligations',
+                            'Identifying potential legal risks and exposures'
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // Show detailed opportunity modal
+        function showOpportunityModal(opportunityId) {
+            const data = opportunityData[opportunityId];
+            if (!data) return;
+
+            // Update modal content
+            document.getElementById('detailModalTitle').textContent = data.title;
+            document.getElementById('detailImpactScore').textContent = data.impactScore;
+            document.getElementById('detailTimeSaved').textContent = data.timeSaved;
+            document.getElementById('detailImplementationEffort').textContent = data.implementationEffort;
+            document.getElementById('detailPriorityScore').textContent = data.priorityScore;
+            document.getElementById('detailSolutionOverview').textContent = data.solutionOverview;
+
+            // Update teams
+            document.getElementById('detailTeam1Name').textContent = data.teams[0].name;
+            const team1Points = document.getElementById('detailTeam1Points');
+            team1Points.innerHTML = '';
+            data.teams[0].points.forEach(point => {
+                const li = document.createElement('li');
+                li.className = 'flex items-start';
+                li.innerHTML = `
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                    <span class="text-sm text-gray-700">${point}</span>
+                `;
+                team1Points.appendChild(li);
+            });
+
+            if (data.teams[1]) {
+                document.getElementById('detailTeam2Name').textContent = data.teams[1].name;
+                const team2Points = document.getElementById('detailTeam2Points');
+                team2Points.innerHTML = '';
+                data.teams[1].points.forEach(point => {
+                    const li = document.createElement('li');
+                    li.className = 'flex items-start';
+                    li.innerHTML = `
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                        <span class="text-sm text-gray-700">${point}</span>
+                    `;
+                    team2Points.appendChild(li);
+                });
+            }
+
+            // Show modal
+            const modal = document.getElementById('opportunityDetailModal');
+            const modalContent = document.getElementById('detailModalContent');
+            modal.classList.remove('hidden');
+            
+            // Trigger animation
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+
+            // Re-initialize icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        // Initialize detailed modal
+        function initializeDetailModal() {
+            const modal = document.getElementById('opportunityDetailModal');
+            const closeModal = document.getElementById('closeDetailModal');
+            
+            const hideModal = () => {
+                const modalContent = document.getElementById('detailModalContent');
+                
+                modalContent.classList.remove('scale-100', 'opacity-100');
+                modalContent.classList.add('scale-95', 'opacity-0');
+                
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            };
+            
+            // Close modal when clicking close button
+            closeModal.addEventListener('click', hideModal);
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    hideModal();
+                }
+            });
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    hideModal();
+                }
+            });
+        }
+
+        // Profile dropdown functionality
+        function initializeProfileDropdown() {
+            const profileBtn = document.getElementById('profileDropdownBtn');
+            const dropdown = document.getElementById('profileDropdown');
+            const adminDashboardLink = document.getElementById('adminDashboardLink');
+            const adminNavLink = document.getElementById('adminNavLink');
+            
+            // Toggle dropdown
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!profileBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+            
+            // Show/hide admin dashboard link based on user role
+            const authState = localStorage.getItem('auth_state');
+            if (authState) {
+                try {
+                    const user = JSON.parse(authState);
+                    if (user.role === 'admin') {
+                        adminDashboardLink.classList.remove('hidden');
+                    } else {
+                        adminNavLink.style.display = 'none'; // Hide admin nav link for regular users
+                    }
+                } catch (error) {
+                    console.error('Error parsing auth state:', error);
+                }
+            }
+        }
+
+        // Initialize scatter plot and popup when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            createScatterPlot();
+            initializePopup();
+            initializeDetailModal();
+            initializeProfileDropdown();
+        });
+    </script>
+</body>
+</html>

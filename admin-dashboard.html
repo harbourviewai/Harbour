@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Harbourview AI Strategy Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="auth-guard.js"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Left side - Logo and Title -->
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 flex items-center justify-center">
+                            <img src="Harbourview AI logo black transparent.png" 
+                                 alt="Harbourview AI Logo" 
+                                 class="w-8 h-8 object-contain">
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+                            <p class="text-sm text-gray-600">Harbourview AI</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right side - Navigation and User Info -->
+                <div class="flex items-center space-x-6">
+                    <!-- Navigation -->
+                    <nav class="flex space-x-8">
+                        <a href="overview.html" class="nav-item">Overview</a>
+                        <a href="teams.html" class="nav-item">Teams</a>
+                        <a href="opportunities.html" class="nav-item">Opportunities</a>
+                        <a href="simulator.html" class="nav-item">Simulator</a>
+                        <a href="roadmap.html" class="nav-item">Roadmap</a>
+                        <a href="admin.html" class="nav-item">Admin</a>
+                    </nav>
+
+                    <!-- User Profile Dropdown -->
+                    <div class="relative">
+                        <button id="profileDropdownBtn" class="flex items-center space-x-3 text-sm hover:text-gray-900 transition-colors">
+                            <div class="text-right">
+                                <div id="userName" class="font-medium text-gray-900"></div>
+                                <div id="userRole" class="text-xs text-gray-500"></div>
+                            </div>
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="user" class="w-4 h-4 text-blue-600"></i>
+                            </div>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 hidden">
+                            <a href="admin-dashboard.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 bg-blue-50">
+                                <i data-lucide="settings" class="w-4 h-4 mr-3"></i>
+                                Admin Dashboard
+                            </a>
+                            <a href="admin.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i data-lucide="shield" class="w-4 h-4 mr-3"></i>
+                                Client Admin
+                            </a>
+                            <hr class="my-1">
+                            <button id="logoutBtn" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i data-lucide="log-out" class="w-4 h-4 mr-3"></i>
+                                Log out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Dashboard Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h2>
+                <p class="text-gray-600">Manage all client accounts and monitor platform activity</p>
+            </div>
+            <div class="flex space-x-3">
+                <button id="addClientBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <i data-lucide="plus" class="w-4 h-4 mr-2 inline"></i>
+                    Add Client
+                </button>
+                <button id="exportDataBtn" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+                    <i data-lucide="download" class="w-4 h-4 mr-2 inline"></i>
+                    Export
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Clients -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Clients</p>
+                        <p id="totalClients" class="text-3xl font-bold text-gray-900">12</p>
+                        <p class="text-sm text-green-600 mt-1">+2 this month</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="users" class="w-6 h-6 text-blue-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Users -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Active Users</p>
+                        <p id="activeUsers" class="text-3xl font-bold text-gray-900">45</p>
+                        <p class="text-sm text-green-600 mt-1">+12 this week</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="user-check" class="w-6 h-6 text-blue-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Revenue This Month</p>
+                        <p id="revenue" class="text-3xl font-bold text-gray-900">$15,240</p>
+                        <p class="text-sm text-green-600 mt-1">+23% from last month</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="dollar-sign" class="w-6 h-6 text-purple-600"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Growth Rate -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Growth Rate</p>
+                        <p id="growthRate" class="text-3xl font-bold text-gray-900">+23%</p>
+                        <p class="text-sm text-green-600 mt-1">vs last month</p>
+                    </div>
+                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="trending-up" class="w-6 h-6 text-orange-600"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics and Activity Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Client Engagement Chart -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Client Engagement</h3>
+                    <select class="text-sm border border-gray-300 rounded-lg px-3 py-1">
+                        <option>Last 7 days</option>
+                        <option>Last 30 days</option>
+                        <option>Last 90 days</option>
+                    </select>
+                </div>
+                <div class="h-64">
+                    <canvas id="engagementChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Activity Feed -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Recent Activity</h3>
+                <div id="activityFeed" class="space-y-4 max-h-64 overflow-y-auto">
+                    <!-- Activity items will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Most Active Clients -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Most Active Clients</h3>
+                <button class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</button>
+            </div>
+            <div id="mostActiveClients" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Most active client cards will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- All Clients Section -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">All Clients</h3>
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <input type="text" id="clientSearch" placeholder="Search clients..." 
+                               class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                    </div>
+                    <select id="statusFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="trial">Trial</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Clients Grid -->
+            <div id="clientsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Client cards will be populated by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Client Modal -->
+    <div id="addClientModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold text-gray-900">Add New Client</h3>
+                    <button id="closeAddClientModal" class="text-gray-400 hover:text-gray-600">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                
+                <form id="addClientForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                        <input type="text" id="newClientName" required 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="Enter company name">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                        <select id="newClientIndustry" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select industry</option>
+                            <option value="Legal Services">Legal Services</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Manufacturing">Manufacturing</option>
+                            <option value="Retail">Retail</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
+                        <input type="email" id="newClientEmail" required 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="Enter contact email">
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" id="cancelAddClient" 
+                                class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            Add Client
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Admin Dashboard Manager
+        class AdminDashboard {
+            constructor() {
+                this.clients = [];
+                this.engagementChart = null;
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.loadDashboardData();
+                this.initializeCharts();
+            }
+
+            bindEvents() {
+                // Add client modal
+                document.getElementById('addClientBtn').addEventListener('click', () => {
+                    this.showAddClientModal();
+                });
+
+                document.getElementById('closeAddClientModal').addEventListener('click', () => {
+                    this.hideAddClientModal();
+                });
+
+                document.getElementById('cancelAddClient').addEventListener('click', () => {
+                    this.hideAddClientModal();
+                });
+
+                document.getElementById('addClientForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addNewClient();
+                });
+
+                // Search and filter
+                document.getElementById('clientSearch').addEventListener('input', () => {
+                    this.filterClients();
+                });
+
+                document.getElementById('statusFilter').addEventListener('change', () => {
+                    this.filterClients();
+                });
+
+                // Export data
+                document.getElementById('exportDataBtn').addEventListener('click', () => {
+                    this.exportData();
+                });
+            }
+
+            async loadDashboardData() {
+                // Load sample client data
+                this.clients = [
+                    {
+                        id: 1,
+                        name: 'Sterling & Associates',
+                        industry: 'Legal Services',
+                        status: 'active',
+                        users: 8,
+                        lastActivity: '2 hours ago',
+                        logo: 'https://via.placeholder.com/40x40/3B82F6/FFFFFF?text=S',
+                        engagement: 85,
+                        revenue: 2400
+                    },
+                    {
+                        id: 2,
+                        name: 'Acme Corporation',
+                        industry: 'Technology',
+                        status: 'active',
+                        users: 12,
+                        lastActivity: '5 minutes ago',
+                        logo: 'https://via.placeholder.com/40x40/10B981/FFFFFF?text=A',
+                        engagement: 92,
+                        revenue: 3600
+                    },
+                    {
+                        id: 3,
+                        name: 'TechStart Inc',
+                        industry: 'Startup',
+                        status: 'trial',
+                        users: 3,
+                        lastActivity: '1 day ago',
+                        logo: 'https://via.placeholder.com/40x40/8B5CF6/FFFFFF?text=T',
+                        engagement: 67,
+                        revenue: 800
+                    },
+                    {
+                        id: 4,
+                        name: 'Global Finance',
+                        industry: 'Finance',
+                        status: 'suspended',
+                        users: 0,
+                        lastActivity: '1 week ago',
+                        logo: 'https://via.placeholder.com/40x40/EF4444/FFFFFF?text=G',
+                        engagement: 23,
+                        revenue: 0
+                    },
+                    {
+                        id: 5,
+                        name: 'MedTech Solutions',
+                        industry: 'Healthcare',
+                        status: 'active',
+                        users: 15,
+                        lastActivity: '30 minutes ago',
+                        logo: 'https://via.placeholder.com/40x40/F59E0B/FFFFFF?text=M',
+                        engagement: 78,
+                        revenue: 4200
+                    },
+                    {
+                        id: 6,
+                        name: 'RetailMax',
+                        industry: 'Retail',
+                        status: 'active',
+                        users: 7,
+                        lastActivity: '1 hour ago',
+                        logo: 'https://via.placeholder.com/40x40/06B6D4/FFFFFF?text=R',
+                        engagement: 71,
+                        revenue: 1800
+                    }
+                ];
+
+                this.updateMetrics();
+                this.renderMostActiveClients();
+                this.renderAllClients();
+                this.renderActivityFeed();
+            }
+
+            updateMetrics() {
+                const totalClients = this.clients.length;
+                const activeUsers = this.clients.reduce((sum, client) => sum + client.users, 0);
+                const revenue = this.clients.reduce((sum, client) => sum + client.revenue, 0);
+                const activeClients = this.clients.filter(client => client.status === 'active').length;
+                const growthRate = ((activeClients / totalClients) * 100).toFixed(0);
+
+                document.getElementById('totalClients').textContent = totalClients;
+                document.getElementById('activeUsers').textContent = activeUsers;
+                document.getElementById('revenue').textContent = `$${revenue.toLocaleString()}`;
+                document.getElementById('growthRate').textContent = `+${growthRate}%`;
+            }
+
+            initializeCharts() {
+                const ctx = document.getElementById('engagementChart').getContext('2d');
+                this.engagementChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Client Logins',
+                            data: [45, 52, 38, 61, 55, 28, 42],
+                            borderColor: '#3B82F6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            renderMostActiveClients() {
+                const mostActive = this.clients
+                    .filter(client => client.status === 'active')
+                    .sort((a, b) => b.engagement - a.engagement)
+                    .slice(0, 4);
+
+                const container = document.getElementById('mostActiveClients');
+                container.innerHTML = mostActive.map(client => `
+                    <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors cursor-pointer" 
+                         onclick="adminDashboard.viewClient('${client.id}')">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <img src="${client.logo}" alt="${client.name}" class="w-10 h-10 rounded-lg">
+                            <div>
+                                <h4 class="font-medium text-gray-900">${client.name}</h4>
+                                <p class="text-sm text-gray-600">${client.industry}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">${client.engagement}% engagement</span>
+                            <button class="text-blue-600 hover:text-blue-700 text-sm font-medium">View</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            renderAllClients() {
+                const container = document.getElementById('clientsGrid');
+                container.innerHTML = this.clients.map(client => `
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                        <div class="flex items-center justify-between mb-4">
+                            <img src="${client.logo}" alt="${client.name}" class="w-12 h-12 rounded-lg">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${this.getStatusClass(client.status)}">
+                                ${client.status.charAt(0).toUpperCase() + client.status.slice(1)}
+                            </span>
+                        </div>
+                        
+                        <h3 class="font-semibold text-gray-900 mb-1">${client.name}</h3>
+                        <p class="text-sm text-gray-600 mb-3">${client.industry}</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Users:</span>
+                                <span class="font-medium">${client.users}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Last activity:</span>
+                                <span class="font-medium">${client.lastActivity}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Engagement:</span>
+                                <span class="font-medium">${client.engagement}%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <button onclick="adminDashboard.viewClient('${client.id}')" 
+                                    class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                                View Dashboard
+                            </button>
+                            <button onclick="adminDashboard.editClient('${client.id}')" 
+                                    class="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                                <i data-lucide="settings" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Re-initialize Lucide icons
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }
+
+            renderActivityFeed() {
+                const activities = [
+                    { type: 'login', client: 'Acme Corporation', user: 'Sarah Johnson', time: '5 minutes ago' },
+                    { type: 'update', client: 'Sterling & Associates', user: 'Mike Chen', time: '2 hours ago' },
+                    { type: 'login', client: 'MedTech Solutions', user: 'Alex Smith', time: '30 minutes ago' },
+                    { type: 'new_user', client: 'RetailMax', user: 'New user invited', time: '1 hour ago' },
+                    { type: 'login', client: 'TechStart Inc', user: 'Demo User', time: '1 day ago' }
+                ];
+
+                const container = document.getElementById('activityFeed');
+                container.innerHTML = activities.map(activity => `
+                    <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i data-lucide="${this.getActivityIcon(activity.type)}" class="w-4 h-4 text-blue-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-gray-900">${activity.user}</p>
+                            <p class="text-xs text-gray-600">${activity.client}</p>
+                        </div>
+                        <span class="text-xs text-gray-500">${activity.time}</span>
+                    </div>
+                `).join('');
+
+                // Re-initialize Lucide icons
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }
+
+            getStatusClass(status) {
+                const classes = {
+                    'active': 'bg-green-100 text-green-800',
+                    'trial': 'bg-yellow-100 text-yellow-800',
+                    'suspended': 'bg-red-100 text-red-800'
+                };
+                return classes[status] || 'bg-gray-100 text-gray-800';
+            }
+
+            getActivityIcon(type) {
+                const icons = {
+                    'login': 'log-in',
+                    'update': 'edit',
+                    'new_user': 'user-plus'
+                };
+                return icons[type] || 'activity';
+            }
+
+            showAddClientModal() {
+                document.getElementById('addClientModal').classList.remove('hidden');
+            }
+
+            hideAddClientModal() {
+                document.getElementById('addClientModal').classList.add('hidden');
+                document.getElementById('addClientForm').reset();
+            }
+
+            addNewClient() {
+                const name = document.getElementById('newClientName').value;
+                const industry = document.getElementById('newClientIndustry').value;
+                const email = document.getElementById('newClientEmail').value;
+
+                // Add new client to the list
+                const newClient = {
+                    id: this.clients.length + 1,
+                    name: name,
+                    industry: industry,
+                    status: 'trial',
+                    users: 0,
+                    lastActivity: 'Just now',
+                    logo: `https://via.placeholder.com/40x40/6B7280/FFFFFF?text=${name.charAt(0)}`,
+                    engagement: 0,
+                    revenue: 0
+                };
+
+                this.clients.push(newClient);
+                this.updateMetrics();
+                this.renderAllClients();
+                this.hideAddClientModal();
+
+                // Show success notification
+                this.showNotification('Client added successfully!', 'success');
+            }
+
+            filterClients() {
+                const searchTerm = document.getElementById('clientSearch').value.toLowerCase();
+                const statusFilter = document.getElementById('statusFilter').value;
+
+                const filtered = this.clients.filter(client => {
+                    const matchesSearch = client.name.toLowerCase().includes(searchTerm) || 
+                                        client.industry.toLowerCase().includes(searchTerm);
+                    const matchesStatus = !statusFilter || client.status === statusFilter;
+                    return matchesSearch && matchesStatus;
+                });
+
+                this.renderFilteredClients(filtered);
+            }
+
+            renderFilteredClients(clients) {
+                const container = document.getElementById('clientsGrid');
+                if (clients.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500">No clients found</div>';
+                    return;
+                }
+
+                container.innerHTML = clients.map(client => `
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                        <div class="flex items-center justify-between mb-4">
+                            <img src="${client.logo}" alt="${client.name}" class="w-12 h-12 rounded-lg">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${this.getStatusClass(client.status)}">
+                                ${client.status.charAt(0).toUpperCase() + client.status.slice(1)}
+                            </span>
+                        </div>
+                        
+                        <h3 class="font-semibold text-gray-900 mb-1">${client.name}</h3>
+                        <p class="text-sm text-gray-600 mb-3">${client.industry}</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Users:</span>
+                                <span class="font-medium">${client.users}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Last activity:</span>
+                                <span class="font-medium">${client.lastActivity}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Engagement:</span>
+                                <span class="font-medium">${client.engagement}%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <button onclick="adminDashboard.viewClient('${client.id}')" 
+                                    class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                                View Dashboard
+                            </button>
+                            <button onclick="adminDashboard.editClient('${client.id}')" 
+                                    class="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 transition-colors">
+                                <i data-lucide="settings" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Re-initialize Lucide icons
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }
+
+            viewClient(clientId) {
+                // Navigate to client dashboard
+                window.location.href = `overview.html?client=${clientId}`;
+            }
+
+            editClient(clientId) {
+                // Open client edit modal (to be implemented)
+                this.showNotification('Client editing feature coming soon!', 'info');
+            }
+
+            exportData() {
+                // Export client data as CSV
+                const csvContent = this.generateCSV();
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'clients-export.csv';
+                a.click();
+                window.URL.revokeObjectURL(url);
+            }
+
+            generateCSV() {
+                const headers = ['Name', 'Industry', 'Status', 'Users', 'Engagement', 'Revenue'];
+                const rows = this.clients.map(client => [
+                    client.name,
+                    client.industry,
+                    client.status,
+                    client.users,
+                    client.engagement,
+                    client.revenue
+                ]);
+                
+                return [headers, ...rows].map(row => row.join(',')).join('\n');
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+                
+                notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50`;
+                notification.innerHTML = `
+                    <div class="flex items-center">
+                        <i data-lucide="${type === 'success' ? 'check-circle' : type === 'error' ? 'alert-circle' : 'info'}" class="w-5 h-5 mr-2"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Re-initialize Lucide icons
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        }
+
+        // Profile dropdown functionality
+        function initializeProfileDropdown() {
+            const profileBtn = document.getElementById('profileDropdownBtn');
+            const dropdown = document.getElementById('profileDropdown');
+            
+            // Toggle dropdown
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!profileBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        // Initialize admin dashboard when DOM is loaded
+        let adminDashboard;
+        document.addEventListener('DOMContentLoaded', () => {
+            adminDashboard = new AdminDashboard();
+            initializeProfileDropdown();
+        });
+    </script>
+</body>
+</html>

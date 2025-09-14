@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Admin - Harbourview AI Strategy Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="auth-guard.js"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Left side - Logo and Title -->
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 flex items-center justify-center">
+                            <img src="Harbourview AI logo black transparent.png" 
+                                 alt="Harbourview AI Logo" 
+                                 class="w-8 h-8 object-contain">
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">AI Strategy Report</h1>
+                            <p class="text-sm text-gray-600">Harbourview AI</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right side - Navigation and User Info -->
+                <div class="flex items-center space-x-6">
+                    <!-- Navigation -->
+                    <nav class="flex space-x-8">
+                        <a href="overview.html" class="nav-item">Overview</a>
+                        <a href="teams.html" class="nav-item">Teams</a>
+                        <a href="opportunities.html" class="nav-item">Opportunities</a>
+                        <a href="simulator.html" class="nav-item">Simulator</a>
+                        <a href="roadmap.html" class="nav-item">Roadmap</a>
+                        <a href="admin.html" class="nav-item active">Admin</a>
+                    </nav>
+
+                    <!-- User Profile Dropdown -->
+                    <div class="relative">
+                        <button id="profileDropdownBtn" class="flex items-center space-x-3 text-sm hover:text-gray-900 transition-colors">
+                            <div class="text-right">
+                                <div id="userName" class="font-medium text-gray-900"></div>
+                                <div id="userRole" class="text-xs text-gray-500"></div>
+                            </div>
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="user" class="w-4 h-4 text-blue-600"></i>
+                            </div>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 hidden">
+                            <a href="admin-dashboard.html" id="adminDashboardLink" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hidden">
+                                <i data-lucide="settings" class="w-4 h-4 mr-3"></i>
+                                Admin Dashboard
+                            </a>
+                            <a href="admin.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 bg-blue-50">
+                                <i data-lucide="shield" class="w-4 h-4 mr-3"></i>
+                                Admin Panel
+                            </a>
+                            <hr class="my-1">
+                            <button id="logoutBtn" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i data-lucide="log-out" class="w-4 h-4 mr-3"></i>
+                                Log out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Client Administration</h2>
+            <p class="text-gray-600">Manage your team, branding, and data settings</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Column -->
+            <div class="space-y-8">
+                <!-- User Management -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Team Management</h3>
+                    <button id="inviteUserBtn" class="w-full btn-primary flex items-center justify-center mb-4">
+                        <i data-lucide="user-plus" class="w-5 h-5 mr-2"></i>
+                        Invite Team Member
+                    </button>
+                    
+                    <!-- Users List -->
+                    <div id="usersList" class="space-y-3">
+                        <!-- Users will be loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Branding Customization -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Branding Customization</h3>
+                    
+                    <!-- Client Logo -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Company Logo</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors cursor-pointer" id="logoUploadArea">
+                            <i data-lucide="cloud-upload" class="w-8 h-8 text-gray-400 mx-auto mb-2"></i>
+                            <p class="text-sm text-gray-600">Upload Logo</p>
+                            <p class="text-xs text-gray-500">PNG, JPG up to 2MB</p>
+                            <input type="file" id="logoInput" accept="image/*" class="hidden">
+                        </div>
+                    </div>
+
+                    <!-- Primary Color -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Primary Color</label>
+                        <div class="flex items-center space-x-3">
+                            <input type="color" id="primaryColor" value="#3B82F6" class="w-12 h-10 border border-gray-300 rounded cursor-pointer">
+                            <input type="text" id="primaryColorText" value="#3B82F6" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- Secondary Color -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Secondary Color</label>
+                        <div class="flex items-center space-x-3">
+                            <input type="color" id="secondaryColor" value="#10B981" class="w-12 h-10 border border-gray-300 rounded cursor-pointer">
+                            <input type="text" id="secondaryColorText" value="#10B981" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- Company Name -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                        <input type="text" id="companyName" value="Sterling & Associates" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <button id="saveBrandingBtn" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i data-lucide="save" class="w-4 h-4 mr-2 inline"></i>
+                        Save Branding
+                    </button>
+                </div>
+
+                <!-- Feedback & Comments -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Feedback & Comments</h3>
+                    <form id="feedbackForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Add Comment</label>
+                            <textarea id="feedbackText" rows="3" placeholder="Share your thoughts on the AI strategy..." 
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-2">
+                                <input type="checkbox" id="anonymousFeedback" class="rounded">
+                                <label for="anonymousFeedback" class="text-sm text-gray-600">Post anonymously</label>
+                            </div>
+                            <button type="submit" class="btn-primary text-sm">Submit</button>
+                        </div>
+                    </form>
+                    
+                    <!-- Recent Comments -->
+                    <div id="recentComments" class="mt-4 space-y-3">
+                        <div class="text-sm font-medium text-gray-900 mb-2">Recent Comments</div>
+                        <div id="commentsList" class="space-y-2">
+                            <!-- Comments will be loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-8">
+                <!-- Data Management with Tabbed Interface -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Data Management</h3>
+                        <div class="flex space-x-2">
+                            <button id="exportDataBtn" class="btn-secondary text-sm">
+                                <i data-lucide="download" class="w-4 h-4 mr-1"></i>
+                                Export Data
+                            </button>
+                            <button id="importDataBtn" class="btn-secondary text-sm">
+                                <i data-lucide="upload" class="w-4 h-4 mr-1"></i>
+                                Import Data
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Metrics -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-blue-50 rounded-lg p-4 text-center">
+                            <div class="text-2xl font-bold text-blue-600">12</div>
+                            <div class="text-sm text-blue-800">Opportunities</div>
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-4 text-center">
+                            <div class="text-2xl font-bold text-green-600">4</div>
+                            <div class="text-sm text-green-800">Teams</div>
+                        </div>
+                        <div class="bg-purple-50 rounded-lg p-4 text-center">
+                            <div class="text-2xl font-bold text-purple-600">3</div>
+                            <div class="text-sm text-purple-800">Objectives</div>
+                        </div>
+                        <div class="bg-orange-50 rounded-lg p-4 text-center">
+                            <div class="text-2xl font-bold text-orange-600">Active</div>
+                            <div class="text-sm text-orange-800">Status</div>
+                        </div>
+                    </div>
+
+                    <!-- Data Tabs -->
+                    <div class="border-b border-gray-200 mb-4">
+                        <nav class="-mb-px flex space-x-8">
+                            <button class="data-tab active" data-tab="overview">Overview</button>
+                            <button class="data-tab" data-tab="client-info">Client Info</button>
+                            <button class="data-tab" data-tab="teams">Teams</button>
+                            <button class="data-tab" data-tab="opportunities">Opportunities</button>
+                        </nav>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content-area">
+                        <!-- Overview Content -->
+                        <div id="overview-content" class="tab-content active">
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 mb-2">Project Overview</h4>
+                                    <div class="space-y-2 text-sm">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Client:</span>
+                                            <span id="overviewClient" class="font-medium">Sterling & Associates</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Report Date:</span>
+                                            <span id="overviewReportDate" class="font-medium">2025-01-15</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Sector:</span>
+                                            <span id="overviewSector" class="font-medium">Legal Services</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Status:</span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
+                                        </div>
+                                        <div class="mt-3">
+                                            <span class="text-gray-600 block mb-1">North Star:</span>
+                                            <span id="overviewNorthStar" class="text-sm">Become the premier firm delivering faster legal services through AI integration</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-gray-900 mb-2">Executive Summary</h4>
+                                    <p id="overviewExecutiveSummary" class="text-sm text-gray-700">
+                                        AI integration transforms Sterling & Associates from traditional law practice into an AI-enabled legal powerhouse. Strategic implementation of document automation, case prediction, and client communication tools positions the firm for 40% efficiency gains and enhanced client satisfaction.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Client Info Content -->
+                        <div id="client-info-content" class="tab-content">
+                            <div class="space-y-4">
+                                <h4 class="font-semibold text-gray-900 mb-4">Client Configuration</h4>
+                                <div class="grid grid-cols-1 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Client Name</label>
+                                        <input type="text" id="clientName" value="Sterling & Associates" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Sector</label>
+                                        <input type="text" id="clientSector" value="Legal Services" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Primary Objective</label>
+                                        <textarea id="clientObjective" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">Become the premier firm delivering faster legal services through AI integration</textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Contact Email</label>
+                                        <input type="email" id="clientEmail" value="contact@sterlinglaw.com" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Contact Phone</label>
+                                        <input type="tel" id="clientPhone" value="+1-555-0123" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                </div>
+                                <button id="updateClientInfoBtn" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                    Update Client Info
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Teams Content -->
+                        <div id="teams-content" class="tab-content">
+                            <div class="space-y-4">
+                                <h4 class="font-semibold text-gray-900 mb-4">Teams Information</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="border border-gray-200 rounded-lg p-4 bg-blue-50">
+                                        <h5 class="font-medium text-gray-900 mb-2">Executive Leadership</h5>
+                                        <p class="text-sm text-gray-600">3 members • Lead: Sarah Johnson</p>
+                                        <div class="mt-2 text-xs text-blue-700">Strategic oversight and decision making</div>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4 bg-green-50">
+                                        <h5 class="font-medium text-gray-900 mb-2">Legal Operations</h5>
+                                        <p class="text-sm text-gray-600">8 members • Lead: Mike Chen</p>
+                                        <div class="mt-2 text-xs text-green-700">Core legal services and case management</div>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4 bg-purple-50">
+                                        <h5 class="font-medium text-gray-900 mb-2">Technology Team</h5>
+                                        <p class="text-sm text-gray-600">4 members • Lead: Alex Smith</p>
+                                        <div class="mt-2 text-xs text-purple-700">AI implementation and technical support</div>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4 bg-orange-50">
+                                        <h5 class="font-medium text-gray-900 mb-2">Client Relations</h5>
+                                        <p class="text-sm text-gray-600">2 members • Lead: Emma Davis</p>
+                                        <div class="mt-2 text-xs text-orange-700">Client communication and satisfaction</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Opportunities Content -->
+                        <div id="opportunities-content" class="tab-content">
+                            <div class="space-y-4">
+                                <h4 class="font-semibold text-gray-900 mb-4">Opportunities</h4>
+                                <div class="space-y-3">
+                                    <div class="border border-gray-200 rounded-lg p-4 bg-red-50">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h5 class="font-medium text-gray-900">Document Automation</h5>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">High Priority</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 mb-2">Automate contract generation and legal document processing</p>
+                                        <div class="flex justify-between text-xs text-gray-500">
+                                            <span>Impact: High</span>
+                                            <span>Effort: 3 weeks</span>
+                                        </div>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4 bg-yellow-50">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h5 class="font-medium text-gray-900">Case Prediction Analytics</h5>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Medium Priority</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 mb-2">AI-powered case outcome prediction and risk assessment</p>
+                                        <div class="flex justify-between text-xs text-gray-500">
+                                            <span>Impact: Medium</span>
+                                            <span>Effort: 4 weeks</span>
+                                        </div>
+                                    </div>
+                                    <div class="border border-gray-200 rounded-lg p-4 bg-green-50">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h5 class="font-medium text-gray-900">Client Communication Portal</h5>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Low Priority</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 mb-2">Self-service portal for client case updates and document access</p>
+                                        <div class="flex justify-between text-xs text-gray-500">
+                                            <span>Impact: Low</span>
+                                            <span>Effort: 2 weeks</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                    <div class="space-y-3">
+                        <button id="exportPDFBtn" class="w-full flex items-center justify-between p-3 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
+                            <div class="flex items-center">
+                                <i data-lucide="file-text" class="w-5 h-5 text-red-600 mr-3"></i>
+                                <div>
+                                    <div class="font-medium text-gray-900">Export PDF Report</div>
+                                    <div class="text-sm text-gray-600">Complete strategy report</div>
+                                </div>
+                            </div>
+                            <i data-lucide="arrow-right" class="w-4 h-4 text-gray-400"></i>
+                        </button>
+                        
+                        <button id="generateLinkBtn" class="w-full flex items-center justify-between p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                            <div class="flex items-center">
+                                <i data-lucide="link" class="w-5 h-5 text-blue-600 mr-3"></i>
+                                <div>
+                                    <div class="font-medium text-gray-900">Generate Shareable Link</div>
+                                    <div class="text-sm text-gray-600">Public dashboard access</div>
+                                </div>
+                            </div>
+                            <i data-lucide="arrow-right" class="w-4 h-4 text-gray-400"></i>
+                        </button>
+                        
+                        <button id="refreshDataBtn" class="w-full flex items-center justify-between p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                            <div class="flex items-center">
+                                <i data-lucide="refresh-cw" class="w-5 h-5 text-green-600 mr-3"></i>
+                                <div>
+                                    <div class="font-medium text-gray-900">Refresh Data</div>
+                                    <div class="text-sm text-gray-600">Sync with latest changes</div>
+                                </div>
+                            </div>
+                            <i data-lucide="arrow-right" class="w-4 h-4 text-gray-400"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Profile dropdown functionality
+        function initializeProfileDropdown() {
+            const profileBtn = document.getElementById('profileDropdownBtn');
+            const dropdown = document.getElementById('profileDropdown');
+            const adminDashboardLink = document.getElementById('adminDashboardLink');
+            
+            // Toggle dropdown
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!profileBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+            
+            // Show/hide admin dashboard link based on user role
+            const authState = localStorage.getItem('auth_state');
+            if (authState) {
+                try {
+                    const user = JSON.parse(authState);
+                    if (user.role === 'admin') {
+                        adminDashboardLink.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error('Error parsing auth state:', error);
+                }
+            }
+        }
+
+        // Tab functionality
+        function initializeTabs() {
+            const tabButtons = document.querySelectorAll('.data-tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs and contents
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    button.classList.add('active');
+                    const targetContent = document.getElementById(`${targetTab}-content`);
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // Simple client admin functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            // Basic functionality for client admin page
+            console.log('Client admin page loaded');
+            
+            // Initialize profile dropdown
+            initializeProfileDropdown();
+            
+            // Initialize tabs
+            initializeTabs();
+            
+            // Add event listeners for basic functionality
+            document.getElementById('saveBrandingBtn')?.addEventListener('click', () => {
+                alert('Branding saved! (Demo mode)');
+            });
+            
+            document.getElementById('exportDataBtn')?.addEventListener('click', () => {
+                alert('Data exported! (Demo mode)');
+            });
+            
+            document.getElementById('inviteUserBtn')?.addEventListener('click', () => {
+                alert('User invitation feature coming soon!');
+            });
+            
+            document.getElementById('updateClientInfoBtn')?.addEventListener('click', () => {
+                alert('Client info updated! (Demo mode)');
+            });
+            
+            document.getElementById('exportPDFBtn')?.addEventListener('click', () => {
+                alert('PDF export started! (Demo mode)');
+            });
+            
+            document.getElementById('generateLinkBtn')?.addEventListener('click', () => {
+                alert('Shareable link generated! (Demo mode)');
+            });
+            
+            document.getElementById('refreshDataBtn')?.addEventListener('click', () => {
+                alert('Data refreshed! (Demo mode)');
+            });
+        });
+    </script>
+</body>
+</html>

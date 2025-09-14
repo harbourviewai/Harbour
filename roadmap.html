@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roadmap - Harbourview AI Strategy Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Left side - Logo and Title -->
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 flex items-center justify-center">
+                            <img src="Harbourview AI logo black transparent.png" 
+                                 alt="Harbourview AI Logo" 
+                                 class="w-8 h-8 object-contain">
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">AI Strategy Report</h1>
+                            <p class="text-sm text-gray-600">Harbourview AI</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right side - Client Selector (Admin Only) and Navigation -->
+                <div class="flex items-center space-x-6">
+                    <!-- Client Selector (Admin Only) -->
+                    <div id="adminClientSelector" class="relative hidden">
+                        <select id="clientSelector" class="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="demo">Sterling & Associates (Demo)</option>
+                            <option value="client-1">Acme Corp</option>
+                            <option value="client-2">TechStart Inc</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
+                    </div>
+
+                    <!-- Client Name Display (Regular Users) -->
+                    <div id="clientNameDisplay" class="text-sm font-medium text-gray-700">
+                        <!-- Will be populated by auth guard -->
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <nav class="flex space-x-8">
+                        <a href="overview.html" class="nav-item">Overview</a>
+                        <a href="teams.html" class="nav-item">Teams</a>
+                        <a href="opportunities.html" class="nav-item">Opportunities</a>
+                        <a href="simulator.html" class="nav-item">Simulator</a>
+                        <a href="roadmap.html" class="nav-item active">Roadmap</a>
+                        <a href="admin.html" class="nav-item" id="adminNavLink">Admin</a>
+                    </nav>
+
+                    <!-- User Profile Dropdown -->
+                    <div class="relative">
+                        <button id="profileDropdownBtn" class="flex items-center space-x-3 text-sm hover:text-gray-900 transition-colors">
+                            <div class="text-right">
+                                <div id="userName" class="font-medium text-gray-900"></div>
+                                <div id="userRole" class="text-xs text-gray-500"></div>
+                            </div>
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i data-lucide="user" class="w-4 h-4 text-blue-600"></i>
+                            </div>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="profileDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 hidden">
+                            <a href="admin-dashboard.html" id="adminDashboardLink" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hidden">
+                                <i data-lucide="settings" class="w-4 h-4 mr-3"></i>
+                                Admin Dashboard
+                            </a>
+                            <a href="admin.html" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i data-lucide="shield" class="w-4 h-4 mr-3"></i>
+                                Admin Panel
+                            </a>
+                            <hr class="my-1">
+                            <button id="logoutBtn" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i data-lucide="log-out" class="w-4 h-4 mr-3"></i>
+                                Log out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Implementation Roadmap</h2>
+            <p class="text-gray-600">Strategic timeline for AI implementation across all phases</p>
+        </div>
+
+        <!-- Timeline Overview -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Implementation Phases</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="text-center p-4 bg-teal-50 rounded-lg">
+                    <div class="w-12 h-12 bg-teal-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="zap" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div class="font-semibold text-gray-900">Phase 1</div>
+                    <div class="text-sm text-gray-600">Quick Wins</div>
+                    <div class="text-xs text-gray-500 mt-1">Weeks 1-4</div>
+                </div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                    <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="target" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div class="font-semibold text-gray-900">Phase 2</div>
+                    <div class="text-sm text-gray-600">Core Solutions</div>
+                    <div class="text-xs text-gray-500 mt-1">Weeks 5-12</div>
+                </div>
+                <div class="text-center p-4 bg-green-50 rounded-lg">
+                    <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div class="font-semibold text-gray-900">Phase 3</div>
+                    <div class="text-sm text-gray-600">Advanced Features</div>
+                    <div class="text-xs text-gray-500 mt-1">Weeks 13-20</div>
+                </div>
+                <div class="text-center p-4 bg-purple-50 rounded-lg">
+                    <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="award" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div class="font-semibold text-gray-900">Phase 4</div>
+                    <div class="text-sm text-gray-600">Optimization</div>
+                    <div class="text-xs text-gray-500 mt-1">Weeks 21-24</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gantt Chart -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Implementation Timeline</h3>
+            <div class="overflow-x-auto">
+                <div class="min-w-full">
+                    <!-- Header -->
+                    <div class="flex mb-4">
+                        <div class="w-48 flex-shrink-0 font-medium text-gray-900">Milestone</div>
+                        <div class="flex-1 flex">
+                            <div class="w-12 text-center text-xs text-gray-500">W1</div>
+                            <div class="w-12 text-center text-xs text-gray-500">W2</div>
+                            <div class="w-12 text-center text-xs text-gray-500">W3</div>
+                            <div class="w-12 text-center text-xs text-gray-500">W4</div>
+                            <div class="w-12 text-center text-xs text-gray-500">W5</div>
+                            <div class="w-12 text-center text-xs text-gray-500">W6</div>
+                            <div class="w-12 text-center text-xs text-gray-500">W7</div>
+                            <div class="w-12 text-center text-xs text-gray-500">W8</div>
+                            <div class="w-12 text-center text-xs text-gray-500">W9</div>
+                            <div class="w-12 text-center text-xs text-gray-500">W10</div>
+                            <div class="w-12 text-center text-xs text-gray-500">W11</div>
+                            <div class="w-12 text-center text-xs text-gray-500">W12</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Timeline bars -->
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <div class="w-48 flex-shrink-0 text-sm text-gray-700">Document Review Automation</div>
+                            <div class="flex-1 relative h-6 bg-gray-100 rounded">
+                                <div class="absolute left-0 w-3/12 h-full bg-teal-500 rounded flex items-center justify-center">
+                                    <span class="text-xs text-white font-medium">Phase 1</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-48 flex-shrink-0 text-sm text-gray-700">Client Communication Bot</div>
+                            <div class="flex-1 relative h-6 bg-gray-100 rounded">
+                                <div class="absolute left-1/12 w-4/12 h-full bg-blue-500 rounded flex items-center justify-center">
+                                    <span class="text-xs text-white font-medium">Phase 1-2</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-48 flex-shrink-0 text-sm text-gray-700">Case Research Assistant</div>
+                            <div class="flex-1 relative h-6 bg-gray-100 rounded">
+                                <div class="absolute left-2/12 w-5/12 h-full bg-green-500 rounded flex items-center justify-center">
+                                    <span class="text-xs text-white font-medium">Phase 2</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-48 flex-shrink-0 text-sm text-gray-700">Automated Report Generation</div>
+                            <div class="flex-1 relative h-6 bg-gray-100 rounded">
+                                <div class="absolute left-0 w-2/12 h-full bg-orange-500 rounded flex items-center justify-center">
+                                    <span class="text-xs text-white font-medium">Phase 1</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-48 flex-shrink-0 text-sm text-gray-700">Intelligent Document Search</div>
+                            <div class="flex-1 relative h-6 bg-gray-100 rounded">
+                                <div class="absolute left-3/12 w-4/12 h-full bg-purple-500 rounded flex items-center justify-center">
+                                    <span class="text-xs text-white font-medium">Phase 2-3</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dependencies -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Dependencies & Prerequisites</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-medium text-gray-900 mb-3">Technical Dependencies</h4>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li class="flex items-start">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-green-600 mr-2 mt-0.5"></i>
+                            <span>Cloud infrastructure setup</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-green-600 mr-2 mt-0.5"></i>
+                            <span>Data security compliance review</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="clock" class="w-4 h-4 text-yellow-600 mr-2 mt-0.5"></i>
+                            <span>API integrations configuration</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="clock" class="w-4 h-4 text-yellow-600 mr-2 mt-0.5"></i>
+                            <span>User authentication system</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-medium text-gray-900 mb-3">Organizational Dependencies</h4>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li class="flex items-start">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-green-600 mr-2 mt-0.5"></i>
+                            <span>Executive approval and budget allocation</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="clock" class="w-4 h-4 text-yellow-600 mr-2 mt-0.5"></i>
+                            <span>Team training schedule coordination</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="clock" class="w-4 h-4 text-yellow-600 mr-2 mt-0.5"></i>
+                            <span>Change management planning</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i data-lucide="clock" class="w-4 h-4 text-yellow-600 mr-2 mt-0.5"></i>
+                            <span>Success metrics definition</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="bg-gradient-to-r from-teal-50 to-blue-50 rounded-2xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Executive Summary</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-teal-600 mb-2">51</div>
+                    <div class="text-sm text-gray-600">Total Hours Saved Weekly</div>
+                    <div class="text-xs text-gray-500 mt-1">Across all implementations</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">6</div>
+                    <div class="text-sm text-gray-600">Months to Full ROI</div>
+                    <div class="text-xs text-gray-500 mt-1">Based on current projections</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">$2.1M</div>
+                    <div class="text-sm text-gray-600">Annual Value Creation</div>
+                    <div class="text-xs text-gray-500 mt-1">Conservative estimate</div>
+                </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-white rounded-lg">
+                <h4 class="font-medium text-gray-900 mb-2">Key Success Factors</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+                    <div>
+                        <div class="font-medium mb-1">Immediate Actions Required:</div>
+                        <ul class="space-y-1">
+                            <li>• Secure executive sponsorship</li>
+                            <li>• Assign dedicated project manager</li>
+                            <li>• Begin Phase 1 implementation</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="font-medium mb-1">Risk Mitigation:</div>
+                        <ul class="space-y-1">
+                            <li>• Start with low-risk, high-impact solutions</li>
+                            <li>• Implement gradual rollout strategy</li>
+                            <li>• Maintain regular progress reviews</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="auth-guard.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Profile dropdown functionality
+        function initializeProfileDropdown() {
+            const profileBtn = document.getElementById('profileDropdownBtn');
+            const dropdown = document.getElementById('profileDropdown');
+            const adminDashboardLink = document.getElementById('adminDashboardLink');
+            const adminNavLink = document.getElementById('adminNavLink');
+            
+            // Toggle dropdown
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!profileBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+            
+            // Show/hide admin dashboard link based on user role
+            const authState = localStorage.getItem('auth_state');
+            if (authState) {
+                try {
+                    const user = JSON.parse(authState);
+                    if (user.role === 'admin') {
+                        adminDashboardLink.classList.remove('hidden');
+                    } else {
+                        adminNavLink.style.display = 'none'; // Hide admin nav link for regular users
+                    }
+                } catch (error) {
+                    console.error('Error parsing auth state:', error);
+                }
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeProfileDropdown();
+        });
+    </script>
+</body>
+</html>
